@@ -217,9 +217,8 @@ The loop does not run forever. There are several reasons to stop:
 | **User cancelled** | The user hit Ctrl+C or an abort signal was triggered. |
 | **Context too long** | The conversation history got too big for the model's context window. We will handle this in Chapter 6. |
 | **API error** | The model returned an error (rate limit, server error, etc.). |
-| **Hook stopped** | A user-configured hook blocked the agent from continuing. |
 
-Production agents have even more exit conditions (image processing errors, output token limit recovery, blocking limits). But these six cover the important ones.
+Production agents have even more exit conditions, but these five cover the important ones.
 
 For now, we only implement the first two (no tool calls = done, max turns = safety stop). We will add the others as we go.
 
