@@ -49,6 +49,20 @@ function truncateResult(result: string): string {
 }
 ```
 
+You call this in the agentic loop, right where tool results are collected before pushing them into the conversation:
+
+```typescript
+// In the agentic loop, after executing a tool:
+const result = await tool.call(parsed.data);
+const truncatedResult = truncateResult(result);  // <-- apply before storing
+
+toolResults.push({
+  type: "tool_result",
+  tool_use_id: toolUse.id,
+  content: truncatedResult,
+});
+```
+
 Here is what this looks like in practice. The model reads a large file:
 
 ```
