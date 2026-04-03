@@ -202,6 +202,30 @@ The improvement depends on the workload:
 
 The bigger the batch of concurrent-safe tools, the bigger the win. If the model calls mostly reads and searches (which is common during exploration), concurrency makes a noticeable difference.
 
+## Wiring it into the loop
+
+In previous chapters, we executed tools one at a time in a `for` loop. Now we replace that with batch execution. The change is small:
+
+```typescript
+// Before (sequential):
+for (const toolUse of toolBlocks) {
+  const tool = tools.find(t => t.name === toolUse.name);
+  const result = await tool.call(toolUse.input);
+  toolResults.push({ type: "tool_result", tool_use_id: toolUse.id, content: result });
+}
+
+// After (concurrent):
+const toolCalls = toolBlocks.map(block => ({
+  block,
+  tool: tools.find(t => t.name === block.name),
+  input: block.input,
+}));
+const batches = partitionIntoBatches(toolCalls);
+const toolResults = await executeBatches(batches);
+```
+
+Everything else in the agentic loop stays the same. The tool results still get pushed into the conversation as a user message. The loop still checks for tool_use blocks to decide whether to continue. The only difference is how the tools are executed between those steps.
+
 ## What is still missing
 
 Nothing! This is the final feature layer. You now have a complete AI coding agent with:
