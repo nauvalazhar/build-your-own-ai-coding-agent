@@ -2,7 +2,9 @@
 
 Ever wonder how AI coding tools like Claude Code and Cursor actually work under the hood? It is simpler than you think. The core is a while loop, some tools, and a few clever tricks.
 
-This is a step-by-step guide that takes you from zero to a working AI coding agent. No frameworks. No magic. Just TypeScript and the Anthropic API. Each chapter introduces one concept, explains why it is designed that way, and comes with a runnable example you can try immediately.
+This is a step-by-step guide that takes you from zero to a working AI coding agent. No frameworks. No magic. Just TypeScript and an LLM API. Each chapter introduces one concept, explains why it is designed that way, and comes with a runnable example you can try immediately.
+
+The concepts work with any LLM that supports tool use (Claude, GPT, Gemini, etc.). Our examples use Claude and the Anthropic SDK, but the architecture is provider-agnostic.
 
 ## Who is this for
 
@@ -10,16 +12,16 @@ This is a step-by-step guide that takes you from zero to a working AI coding age
 - Anyone who wants to build their own AI-powered dev tools
 - People who learn best by building, not just reading
 
-You need basic TypeScript knowledge and an Anthropic API key. That is it.
+You need basic TypeScript knowledge and an LLM API key. That is it.
 
 ## What you will build
 
-A CLI tool that uses Claude to read, search, edit files, and run commands. By the end, your agent will have streaming, permissions, subagents, context compression, and concurrent tool execution. The same core ideas behind tools like Claude Code, Cursor, and other AI coding assistants.
+A CLI tool that uses an LLM to read, search, edit files, and run commands. By the end, your agent will have streaming, permissions, subagents, context compression, and concurrent tool execution. The same core ideas behind tools like Claude Code, Cursor, and other AI coding assistants.
 
 ## Prerequisites
 
 - Node.js 18+
-- An Anthropic API key ([get one here](https://console.anthropic.com/))
+- An Anthropic API key ([get one here](https://console.anthropic.com/)) - used in our examples, but the concepts apply to any LLM
 - Basic TypeScript knowledge
 
 ## Setup

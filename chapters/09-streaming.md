@@ -206,7 +206,7 @@ Each `|` represents where a new chunk appeared. The user sees the response build
 
 ## Using the SDK helper
 
-The Anthropic SDK provides a simpler way to handle streaming. Instead of processing raw events, you can use the `finalMessage()` helper to get the complete response after streaming:
+Most LLM SDKs provide helpers for streaming. For example, the Anthropic SDK has a `finalMessage()` helper to get the complete response after streaming:
 
 ```typescript
 const stream = client.messages.stream({ ... });

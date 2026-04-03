@@ -282,7 +282,7 @@ Notice the `is_error: true` flag. When a tool call fails (unknown tool, invalid 
 sequenceDiagram
     participant U as User
     participant A as Agent
-    participant API as Claude API
+    participant API as LLM API
     participant T as Tool
 
     U->>A: "What files are in src/?"

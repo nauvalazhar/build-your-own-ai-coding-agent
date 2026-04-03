@@ -31,7 +31,7 @@ This is what "agentic" means. The model is not just answering a question. It is 
 
 Before we look at the loop, let's clarify what "tool" means here.
 
-When you call the Claude API, you can tell the model about functions it is allowed to use. "You have a function called `read_file` that takes a file path and returns the file contents." These functions are called **tools**.
+Most LLM APIs (Claude, GPT, Gemini, etc.) support a feature called "tool use" or "function calling." You can tell the model about functions it is allowed to use. "You have a function called `read_file` that takes a file path and returns the file contents." These functions are called **tools**.
 
 The model does not run the tools itself. It can only *ask* you to run them. When the model decides it needs to read a file, it responds with a special block called `tool_use`:
 
@@ -145,7 +145,7 @@ If it calls another tool, we repeat the cycle.
 
 ```mermaid
 flowchart TD
-    A[User sends prompt] --> B[Call Claude API]
+    A[User sends prompt] --> B[Call LLM API]
     B --> C{Response has tool_use blocks?}
     C -->|Yes| D[Execute each tool]
     D --> E[Push results to conversation history]

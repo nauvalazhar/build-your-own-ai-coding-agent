@@ -20,10 +20,16 @@ By the end of this guide, you will have built an agent that can:
 
 Each chapter adds one concept. Each comes with a runnable TypeScript example. You can follow along from start to finish, or jump to whatever interests you.
 
+## A note on the AI provider
+
+The concepts in this guide work with any LLM that supports tool use (function calling). OpenAI, Google Gemini, Anthropic Claude, and others all support the same core pattern: you define tools, the model calls them, you return results.
+
+We use Claude and the Anthropic SDK in our examples because that is what we are most familiar with. But the architecture is the same regardless of which provider you use. If you prefer OpenAI, swap the SDK and the model name. The loop, the tools, the permissions, the compression... all of it stays the same.
+
 ## What you need
 
 - **Node.js 18 or later**
-- **An Anthropic API key** - you can get one at [console.anthropic.com](https://console.anthropic.com/)
+- **An Anthropic API key** (used in our examples) - you can get one at [console.anthropic.com](https://console.anthropic.com/)
 - **Basic TypeScript knowledge** - you do not need to be an expert, but you should be comfortable reading TypeScript code
 
 ## Project setup
@@ -41,7 +47,7 @@ Copy the environment file and add your API key:
 cp .env.example .env
 ```
 
-Open `.env` and replace `your-api-key-here` with your actual Anthropic API key.
+Open `.env` and add your API key.
 
 ## The sample project
 
