@@ -45,9 +45,23 @@ The model does not run the tools itself. It can only *ask* you to run them. When
 
 This is the model saying: "I want to call `read_file` with this input. Please run it and tell me the result."
 
-Your code then executes the function, gets the result, and sends it back to the model as a `tool_result` block. The model reads the result and decides what to do next. Maybe it calls another tool. Maybe it responds with text.
+Your code then executes the function, gets the result, and sends it back to the model as a `tool_result` block. What does "execute the function" look like? For a file reading tool, it is just this:
 
-That is the whole mechanism. The model asks, you execute, you report back. The loop below automates this cycle.
+```typescript
+function executeTool(name: string, input: Record<string, string>): string {
+  if (name === "read_file") {
+    return fs.readFileSync(input.file_path, "utf-8");
+  }
+  if (name === "list_files") {
+    return fs.readdirSync(input.directory).join("\n");
+  }
+  // ... more tools
+}
+```
+
+That is it. A tool is a regular function. The model says "call `read_file` with this path", your code reads the file from disk, and you send the contents back. The model reads the result and decides what to do next. Maybe it calls another tool. Maybe it responds with text.
+
+We will build proper tools in Chapter 2. For now, just know that a tool is a function the model can ask you to run. The loop below automates this cycle.
 
 ## The loop
 
