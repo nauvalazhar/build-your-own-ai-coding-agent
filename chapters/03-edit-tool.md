@@ -87,25 +87,41 @@ If the model sends `old_string: "bg-blue-500"`, which one do we replace? We do n
 The rule is simple: **the old_string must appear exactly once in the file.** If it appears zero times, the string was not found. If it appears more than once, the match is ambiguous. Both are errors.
 
 ```typescript
-function editFile(filePath: string, oldString: string, newString: string): string {
-  const content = fs.readFileSync(filePath, "utf-8");
+const editFileTool: Tool = {
+  name: "edit_file",
+  description:
+    "Edit a file by replacing old_string with new_string. " +
+    "The old_string must appear exactly once in the file. " +
+    "Include enough surrounding context to make the match unique.",
+  inputSchema: z.object({
+    file_path: z.string().describe("The path to the file to edit"),
+    old_string: z.string().describe("The exact text to find"),
+    new_string: z.string().describe("The replacement text"),
+    replace_all: z.boolean().optional().describe("Replace all occurrences"),
+  }),
+  async call(input) {
+    const filePath = input.file_path as string;
+    const oldString = input.old_string as string;
+    const newString = input.new_string as string;
+    const content = fs.readFileSync(filePath, "utf-8");
 
-  // Count occurrences
-  const count = content.split(oldString).length - 1;
+    // Count occurrences
+    const count = content.split(oldString).length - 1;
 
-  if (count === 0) {
-    return "Error: The old_string was not found in the file.";
-  }
+    if (count === 0) {
+      return "Error: The old_string was not found in the file.";
+    }
 
-  if (count > 1) {
-    return `Error: Found ${count} matches. Include more surrounding context to make the match unique.`;
-  }
+    if (count > 1) {
+      return `Error: Found ${count} matches. Include more surrounding context to make the match unique.`;
+    }
 
-  // Exactly one match. Safe to replace.
-  const updated = content.replace(oldString, newString);
-  fs.writeFileSync(filePath, updated);
-  return `Edited ${filePath}`;
-}
+    // Exactly one match. Safe to replace.
+    const updated = content.replace(oldString, newString);
+    fs.writeFileSync(filePath, updated);
+    return `Edited ${filePath}`;
+  },
+};
 ```
 
 When the model gets the "Found 3 matches" error, it knows it needs to include more surrounding context. Instead of just `"bg-blue-500"`, it would send:
@@ -194,46 +210,6 @@ if (lastRead) {
 ```
 
 This is a simple version. Production agents go further: they also compare the file content (not just the timestamp) because some systems update timestamps without actually changing the content (cloud sync, antivirus scans). The full check is: if the timestamp changed, compare the content too. Only reject if the content actually differs.
-
-## Putting it together as a tool
-
-Throughout this chapter we looked at the edit logic as standalone functions. But to use it in our agent, we need to wrap it in the same tool format from Chapter 2 and add it to our tools array:
-
-```typescript
-const editFileTool: Tool = {
-  name: "edit_file",
-  description:
-    "Edit a file by replacing old_string with new_string. " +
-    "The old_string must appear exactly once in the file. " +
-    "Include enough surrounding context to make the match unique.",
-  inputSchema: z.object({
-    file_path: z.string().describe("The path to the file to edit"),
-    old_string: z.string().describe("The exact text to find"),
-    new_string: z.string().describe("The replacement text"),
-    replace_all: z.boolean().optional().describe("Replace all occurrences"),
-  }),
-  async call(input) {
-    // All the logic from this chapter goes here:
-    // 1. Check old_string !== new_string
-    // 2. Find the actual string (with quote normalization)
-    // 3. Check uniqueness
-    // 4. Check staleness
-    // 5. Apply string.replace() and save
-  },
-};
-
-// Add it to the tools array alongside the others
-const tools: Tool[] = [
-  readFileTool,
-  editFileTool,  // <-- new
-  writeFileTool,
-  listFilesTool,
-  searchFilesTool,
-  runCommandTool,
-];
-```
-
-The description is important. "The old_string must appear exactly once" and "include enough surrounding context" tell the model how to use the tool correctly. This reduces errors before they happen.
 
 ## What is still missing
 
