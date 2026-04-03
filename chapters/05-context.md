@@ -1,5 +1,13 @@
 # Chapter 5: Context
 
+## The problem
+
+The user has been working with the agent for a while. Five turns ago, the agent read `LoginPage.tsx`. Now the user says: "Change the heading to 30px."
+
+Which heading? In which file? The user did not say. But both the user and the agent know the answer because they were just working on the login page.
+
+How does the model know?
+
 ## What is context?
 
 LLMs do not have memory. Every time you call the API, the model starts fresh. It does not remember the previous call. So how does a conversation work?
@@ -9,14 +17,6 @@ You send the entire conversation history on every call. All the previous user me
 The model reads the whole context and generates a response as if it is seeing the entire conversation for the first time. It looks like the model "remembers," but it is actually re-reading the full conversation every turn.
 
 The context has a size limit called the **context window**. For most models, this is 100,000 to 200,000 tokens. If your conversation grows beyond that, the API call fails. We will deal with that in the next chapter.
-
-## The problem
-
-The user has been working with the agent for a while. Five turns ago, the agent read `LoginPage.tsx`. Now the user says: "Change the heading to 30px."
-
-Which heading? In which file? The user did not say. But both the user and the agent know the answer because they were just working on the login page.
-
-How does the model know?
 
 ## Walkthrough: "Change the heading to 30px"
 
