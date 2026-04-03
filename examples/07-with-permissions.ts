@@ -23,7 +23,7 @@ interface PermissionRule {
 
 const rules: PermissionRule[] = [
   // Safe read-only commands are always allowed
-  { toolName: "run_command", pattern: "^(ls|cat|echo|pwd|git status|git diff|git log|npm --version)", decision: "allow" },
+  { toolName: "run_command", pattern: "^(ls|cat|echo|pwd|git status|git diff|git log)", decision: "allow" },
   // Dangerous patterns are always denied
   { toolName: "run_command", pattern: "rm\\s+-rf\\s+/", decision: "deny" },
 ];
@@ -181,7 +181,7 @@ const runCommandTool: Tool = {
   inputSchema: z.object({ command: z.string() }),
   checkPermissions(input) {
     const cmd = input.command as string;
-    if (/^(ls|cat|echo|pwd|git\s+(status|diff|log)|npm\s+--version)/.test(cmd)) return "allow";
+    if (/^(ls|cat|echo|pwd|git\s+(status|diff|log))/.test(cmd)) return "allow";
     return "ask";
   },
   async call(input) {
