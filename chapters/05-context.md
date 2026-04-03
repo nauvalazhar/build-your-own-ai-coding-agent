@@ -1,12 +1,22 @@
 # Chapter 5: Context
 
+## What is context?
+
+LLMs do not have memory. Every time you call the API, the model starts fresh. It does not remember the previous call. So how does a conversation work?
+
+You send the entire conversation history on every call. All the previous user messages, all the assistant responses, all the tool calls and results. Everything. This is the **context**. It is just the messages array you pass to the API.
+
+The model reads the whole context and generates a response as if it is seeing the entire conversation for the first time. It looks like the model "remembers," but it is actually re-reading the full conversation every turn.
+
+The context has a size limit called the **context window**. For most models, this is 100,000 to 200,000 tokens. If your conversation grows beyond that, the API call fails. We will deal with that in the next chapter.
+
 ## The problem
 
 The user has been working with the agent for a while. Five turns ago, the agent read `LoginPage.tsx`. Now the user says: "Change the heading to 30px."
 
 Which heading? In which file? The user did not say. But both the user and the agent know the answer because they were just working on the login page.
 
-How does the model remember?
+How does the model know?
 
 ## Walkthrough: "Change the heading to 30px"
 
@@ -130,7 +140,7 @@ Turn 10:  Assistant text response          ~200 tokens
                                     Total: ~5,690 tokens
 ```
 
-That is just one user interaction. On the next user message, we send all 5,690 tokens again, plus the new message. And again on the turn after that.
+If you ran the earlier examples, you probably noticed the cost. Most of it comes from tool results being re-sent every turn. That is just one user interaction. On the next user message, we send all 5,690 tokens again, plus the new message. And again on the turn after that.
 
 By turn 20, you might be sending 30,000 tokens per API call. By turn 50, you could be at 100,000+. Each file read adds thousands of tokens that stick around for the rest of the conversation.
 
