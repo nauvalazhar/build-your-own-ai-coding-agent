@@ -202,6 +202,7 @@ async function autoCompact(
     max_tokens: 2048,
     system:
       "Summarize this conversation between a user and a coding assistant. " +
+      "Write in third person (say 'the user asked' and 'the assistant edited', not 'I'). " +
       "Preserve: file paths mentioned, code changes made, current task state, " +
       "and any decisions or preferences expressed. Be concise but complete.",
     messages: messages,
@@ -238,14 +239,18 @@ async function autoCompact(
 After compaction, the conversation looks like:
 
 ```
-[user]:      "[Conversation summary] The user asked to build a login page.
-              I read src/pages/LoginPage.tsx and src/auth/useAuth.ts.
-              I edited LoginPage.tsx to add a form. The current task is..."
-[assistant]: "I understand the context."
+[user]:      "[Conversation summary]
+              The user asked to build a login page. The assistant read
+              src/pages/LoginPage.tsx and src/auth/useAuth.ts, then edited
+              LoginPage.tsx to add a form. The current task is adding
+              validation to the form fields."
+[assistant]: "I understand the context. I will continue from where we left off."
 [user]:      (recent message 1)
 [assistant]: (recent message 2)
 [user]:      (most recent message)
 ```
+
+Why is the summary a `user` message? Because the API requires conversations to start with a `user` message. After compaction, the summary is the first message, so it has to be `role: "user"`. That is why we write it in third person ("the user asked", "the assistant read") instead of first person. It is a neutral recap, not someone talking.
 
 The old messages are gone. Replaced by a summary that preserves the important facts: what files were touched, what changes were made, and what the current task is.
 
