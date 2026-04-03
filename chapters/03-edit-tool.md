@@ -195,6 +195,46 @@ if (lastRead) {
 
 This is a simple version. Production agents go further: they also compare the file content (not just the timestamp) because some systems update timestamps without actually changing the content (cloud sync, antivirus scans). The full check is: if the timestamp changed, compare the content too. Only reject if the content actually differs.
 
+## Putting it together as a tool
+
+Throughout this chapter we looked at the edit logic as standalone functions. But to use it in our agent, we need to wrap it in the same tool format from Chapter 2 and add it to our tools array:
+
+```typescript
+const editFileTool: Tool = {
+  name: "edit_file",
+  description:
+    "Edit a file by replacing old_string with new_string. " +
+    "The old_string must appear exactly once in the file. " +
+    "Include enough surrounding context to make the match unique.",
+  inputSchema: z.object({
+    file_path: z.string().describe("The path to the file to edit"),
+    old_string: z.string().describe("The exact text to find"),
+    new_string: z.string().describe("The replacement text"),
+    replace_all: z.boolean().optional().describe("Replace all occurrences"),
+  }),
+  async call(input) {
+    // All the logic from this chapter goes here:
+    // 1. Check old_string !== new_string
+    // 2. Find the actual string (with quote normalization)
+    // 3. Check uniqueness
+    // 4. Check staleness
+    // 5. Apply string.replace() and save
+  },
+};
+
+// Add it to the tools array alongside the others
+const tools: Tool[] = [
+  readFileTool,
+  editFileTool,  // <-- new
+  writeFileTool,
+  listFilesTool,
+  searchFilesTool,
+  runCommandTool,
+];
+```
+
+The description is important. "The old_string must appear exactly once" and "include enough surrounding context" tell the model how to use the tool correctly. This reduces errors before they happen.
+
 ## What is still missing
 
 The model can now search, read, and edit files. But it does not always make smart choices. Sometimes it guesses file paths instead of searching. Sometimes it tries to edit a file it has not read. In the next chapter, we will fix this with a system prompt that teaches the model how to behave.
