@@ -151,7 +151,7 @@ async function agentLoop(messages: Anthropic.MessageParam[]): Promise<string> {
           break;
 
         case "content_block_stop":
-          if (currentToolId) {
+          if (currentBlockType === "tool_use") {
             contentBlocks.push({
               type: "tool_use",
               id: currentToolId,
@@ -159,8 +159,8 @@ async function agentLoop(messages: Anthropic.MessageParam[]): Promise<string> {
               input: currentToolInput ? JSON.parse(currentToolInput) : {},
             });
             currentToolInput = "";
-            currentToolId = "";
           }
+          currentBlockType = null;
           break;
       }
     }
