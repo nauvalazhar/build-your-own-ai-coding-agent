@@ -214,7 +214,7 @@ The next and final chapter wraps up with ideas for where to go from here.
 ## Running the example
 
 ```bash
-npx tsx examples/10-with-concurrency.ts
+npm run example:10
 ```
 
 Ask the agent to read multiple files and watch the logs. Concurrent reads will execute in a single batch instead of one at a time:

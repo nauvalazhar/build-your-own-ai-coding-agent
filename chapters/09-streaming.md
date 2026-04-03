@@ -229,7 +229,7 @@ When the model calls 3 tools at once (like reading 3 files), we execute them one
 ## Running the example
 
 ```bash
-npx tsx examples/09-with-streaming.ts
+npm run example:09
 ```
 
 Watch how text appears incrementally instead of all at once. Compare the experience with earlier examples.

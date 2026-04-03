@@ -54,16 +54,9 @@ cp .env.example .env
 Each chapter has a matching example file. Run them with:
 
 ```bash
-npx tsx --env-file=.env examples/01-basic-loop.ts
-npx tsx --env-file=.env examples/02-with-tools.ts
-# ... and so on
-```
-
-Or use the npm scripts:
-
-```bash
 npm run example:01
 npm run example:02
+# ... and so on
 ```
 
 Examples build on each other. Start from 01 and work your way up.

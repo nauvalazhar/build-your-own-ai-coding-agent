@@ -359,7 +359,7 @@ The model can read files but it cannot edit them. In the next chapter, we will b
 ## Running the example
 
 ```bash
-npx tsx examples/02-with-tools.ts
+npm run example:02
 ```
 
 Try prompts like:

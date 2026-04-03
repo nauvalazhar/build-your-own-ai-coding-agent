@@ -251,7 +251,7 @@ Our agent runs anything the model asks it to. `rm -rf /`? Sure. `git push --forc
 ## Running the example
 
 ```bash
-npx tsx examples/06-with-compression.ts
+npm run example:06
 ```
 
 Have a long conversation (10+ turns) and watch the `[context]` log. You will see the token count grow, then drop when compression kicks in. Try reading several large files to trigger the threshold faster.

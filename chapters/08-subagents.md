@@ -170,7 +170,7 @@ Our agent works, but the user experience is rough. When the model thinks, the us
 ## Running the example
 
 ```bash
-npx tsx examples/08-with-subagents.ts
+npm run example:08
 ```
 
 Try:

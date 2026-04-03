@@ -257,7 +257,7 @@ Our agent runs everything in one big conversation. Complex tasks sometimes benef
 ## Running the example
 
 ```bash
-npx tsx examples/07-with-permissions.ts
+npm run example:07
 ```
 
 Try:

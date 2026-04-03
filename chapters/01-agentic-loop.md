@@ -218,7 +218,7 @@ Our loop has no tools. The model cannot read files, search code, or run commands
 ## Running the example
 
 ```bash
-npx tsx examples/01-basic-loop.ts
+npm run example:01
 ```
 
 The example sets up the basic loop with a hardcoded tool (a simple echo tool) so you can see the cycle in action. Type a message, and watch the model call the tool and use the result.

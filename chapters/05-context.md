@@ -174,7 +174,7 @@ That is the topic of the next chapter: context compression.
 ## Running the example
 
 ```bash
-npx tsx examples/05-with-context.ts
+npm run example:05
 ```
 
 Try a multi-turn conversation:

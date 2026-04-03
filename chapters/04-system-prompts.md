@@ -190,7 +190,7 @@ The system prompt helps the model behave correctly on each turn. But what about 
 ## Running the example
 
 ```bash
-npx tsx examples/04-with-system-prompt.ts
+npm run example:04
 ```
 
 Try prompts like:

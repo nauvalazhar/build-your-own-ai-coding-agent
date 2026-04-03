@@ -218,7 +218,7 @@ The model can now search, read, and edit files. But it does not always make smar
 ## Running the example
 
 ```bash
-npx tsx examples/03-with-edit.ts
+npm run example:03
 ```
 
 Try prompts like:
