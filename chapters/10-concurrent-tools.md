@@ -116,6 +116,35 @@ function partitionIntoBatches(toolCalls: ToolCall[]): Batch[] {
 }
 ```
 
+Using the example from earlier, the output would look like:
+
+```typescript
+[
+  {
+    concurrent: true,
+    tools: [
+      { name: "read_file", input: { file_path: "src/App.tsx" } },
+      { name: "read_file", input: { file_path: "src/components/Button.tsx" } },
+      { name: "search_files", input: { pattern: "className" } },
+    ]
+  },
+  {
+    concurrent: false,
+    tools: [
+      { name: "edit_file", input: { file_path: "src/App.tsx", ... } },
+    ]
+  },
+  {
+    concurrent: true,
+    tools: [
+      { name: "read_file", input: { file_path: "src/components/Header.tsx" } },
+    ]
+  },
+]
+```
+
+Three batches. The first and third can run their tools in parallel. The second runs alone.
+
 ## Executing batches
 
 Concurrent batches use `Promise.all()`. Non-concurrent batches run one tool at a time:
