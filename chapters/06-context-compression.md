@@ -20,7 +20,12 @@ flowchart LR
     D --> E[Send to API]
 ```
 
-Each layer runs before every API call. Cheap layers run first and handle most cases. Expensive layers only fire when the cheap ones are not enough.
+Each layer runs before every API call. They are ordered by cost:
+
+- **Cheap** means it just manipulates strings in memory. No API calls, no extra tokens, runs in milliseconds. Truncating a string or replacing old text with "[cleared]" is cheap.
+- **Expensive** means it makes an additional API call to the LLM, which costs tokens and takes seconds. Asking the model to summarize the conversation is expensive.
+
+Cheap layers run first and handle most cases. Expensive layers only fire when the cheap ones are not enough.
 
 ## Layer 1: Truncate large tool results
 
