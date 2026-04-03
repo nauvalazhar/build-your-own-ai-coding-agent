@@ -8,6 +8,14 @@ The agent reads 10 API files, 15 test files, and 8 doc files. All those file con
 
 Complex tasks have subtasks that do not need each other's context. The API exploration should not pollute the test-writing context. The test-writing should not pollute the doc-writing context.
 
+## What is a subagent?
+
+A subagent is just another instance of the same agentic loop running with its own conversation history. The main agent spawns it by calling a tool (like any other tool), gives it a prompt, and gets back a text result when it is done.
+
+The key idea: the subagent has its own messages array. Its tool calls and results stay in its own context, not the parent's. The parent only sees the final summary the subagent returns.
+
+It is not a separate program or process. It is the same `agentLoop()` function called with a fresh messages array.
+
 ## Walkthrough: Delegating a search task
 
 The main agent gets: "Find all the components that use the Button component and tell me about them."
