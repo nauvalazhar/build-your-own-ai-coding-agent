@@ -67,24 +67,21 @@ Here is what this looks like in practice. The model reads a large file:
 
 ```
 Before truncation (25,000 characters):
-┌─────────────────────────────────────┐
-│ 1   import express from "express";  │
-│ 2   import cors from "cors";        │
-│ 3   ...                             │
-│ ... (500 more lines)                │
-│ 502 export default app;             │
-└─────────────────────────────────────┘
+
+  1   import express from "express";
+  2   import cors from "cors";
+  3   ...
+  ... (500 more lines)
+  502 export default app;
 
 After truncation (10,000 characters):
-┌─────────────────────────────────────┐
-│ 1   import express from "express";  │
-│ 2   import cors from "cors";        │
-│ 3   ...                             │
-│ ... (first ~200 lines)              │
-│                                     │
-│ [Truncated: result was 25,000       │
-│  characters. Showing first 10,000.] │
-└─────────────────────────────────────┘
+
+  1   import express from "express";
+  2   import cors from "cors";
+  3   ...
+  ... (first ~200 lines)
+
+  [Truncated: result was 25,000 characters. Showing first 10,000.]
 ```
 
 The model sees enough of the file to understand its structure (imports, exports, main patterns) without the full 500 lines eating up context. If it needs a specific section later, it can read the file again with an offset.
@@ -141,30 +138,30 @@ function clearOldResults(
 Here is what this looks like. Say the conversation has 10 tool results and we keep the last 6:
 
 ```
-Before clearing:
-┌─────────────────────────────────────────────────────────────┐
-│ [tool_result] list_files    → "src/App.tsx\nsrc/Button..."  │ ← old, clear
-│ [tool_result] read_file     → "1  import React...(800 lines)"│ ← old, clear
-│ [tool_result] read_file     → "1  export function...(200 l)"│ ← old, clear
-│ [tool_result] search_files  → "src/App.tsx:3: import..."    │ ← old, clear
-│ [tool_result] edit_file     → "Edited src/App.tsx"          │ ← keep (recent 6)
-│ [tool_result] read_file     → "1  import express...(500 l)" │ ← keep
-│ [tool_result] search_files  → "src/routes.ts:12: app.get..."│ ← keep
-│ [tool_result] read_file     → "1  const router...(300 l)"  │ ← keep
-│ [tool_result] edit_file     → "Edited src/routes.ts"        │ ← keep
-│ [tool_result] run_command   → "Tests passed"                │ ← keep
-└─────────────────────────────────────────────────────────────┘
+Before clearing (10 tool results, keeping last 6):
+
+  list_files    → "src/App.tsx\nsrc/Button..."       (500 chars)    ← CLEAR
+  read_file     → "1  import React from...'         (20,000 chars)  ← CLEAR
+  read_file     → "1  export function Button..."    (5,000 chars)   ← CLEAR
+  search_files  → "src/App.tsx:3: import..."        (2,000 chars)   ← CLEAR
+  edit_file     → "Edited src/App.tsx"              (20 chars)      ← keep
+  read_file     → "1  import express from..."       (12,000 chars)  ← keep
+  search_files  → "src/routes.ts:12: app.get..."    (1,500 chars)   ← keep
+  read_file     → "1  const router = ..."           (8,000 chars)   ← keep
+  edit_file     → "Edited src/routes.ts"            (22 chars)      ← keep
+  run_command   → "Tests passed"                    (15 chars)      ← keep
 
 After clearing:
-┌─────────────────────────────────────────────────────────────┐
-│ [tool_result] list_files    → "[Cleared]"                   │ ← was 500 chars
-│ [tool_result] read_file     → "[Cleared]"                   │ ← was 20,000 chars
-│ [tool_result] read_file     → "[Cleared]"                   │ ← was 5,000 chars
-│ [tool_result] search_files  → "[Cleared]"                   │ ← was 2,000 chars
-│ [tool_result] edit_file     → "Edited src/App.tsx"          │ ← unchanged
-│ [tool_result] read_file     → "1  import express...(500 l)" │ ← unchanged
-│ ... (rest unchanged)                                        │
-└─────────────────────────────────────────────────────────────┘
+
+  list_files    → "[Cleared]"                                       ← was 500
+  read_file     → "[Cleared]"                                       ← was 20,000
+  read_file     → "[Cleared]"                                       ← was 5,000
+  search_files  → "[Cleared]"                                       ← was 2,000
+  edit_file     → "Edited src/App.tsx"              (unchanged)
+  read_file     → "1  import express from..."       (unchanged)
+  ... (rest unchanged)
+
+  Freed: ~27,500 characters from 4 old results
 ```
 
 The old file contents (27,500 characters) are gone. But the tool calls in the assistant messages still say "I called read_file on src/App.tsx." The model can see *what* it did, just not the full result. If it needs that file again, it can re-read it.
