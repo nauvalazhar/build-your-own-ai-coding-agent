@@ -61,11 +61,19 @@ In practice, the flag can depend on the input. A shell command like `cat file.tx
 When the model returns multiple tool calls in one response, we group them into batches:
 
 ```
-Tool calls from model:  [Read A, Read B, Search C, Edit D, Read E]
+Tool calls from the model (5 calls in one response):
 
-Batch 1: [Read A, Read B, Search C]  <- all concurrent-safe, run in parallel
-Batch 2: [Edit D]                     <- not safe, run alone
-Batch 3: [Read E]                     <- safe, but must wait for Edit D
+  1. read_file("src/App.tsx")
+  2. read_file("src/components/Button.tsx")
+  3. search_files("className")
+  4. edit_file("src/App.tsx", ...)
+  5. read_file("src/components/Header.tsx")
+
+Partitioned into batches:
+
+  Batch 1: [read_file, read_file, search_files]  ← all safe, run in parallel
+  Batch 2: [edit_file]                            ← not safe, run alone
+  Batch 3: [read_file]                            ← safe, but must wait for the edit
 ```
 
 The algorithm walks through the tool calls left to right:
