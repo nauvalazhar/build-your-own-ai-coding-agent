@@ -69,7 +69,13 @@ These are small, simple files on purpose. They give our agent something real to 
 Each chapter has a matching example file in `examples/`. Run them with:
 
 ```bash
-npx tsx examples/01-basic-loop.ts
+npx tsx --env-file=.env examples/01-basic-loop.ts
+```
+
+The `--env-file=.env` flag loads your API key from the `.env` file. Or you can use the npm scripts which do this automatically:
+
+```bash
+npm run example:01
 ```
 
 The examples build on each other. Example 02 adds tools to the loop from example 01. Example 03 adds the edit tool on top of that. And so on.

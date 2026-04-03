@@ -54,8 +54,8 @@ cp .env.example .env
 Each chapter has a matching example file. Run them with:
 
 ```bash
-npx tsx examples/01-basic-loop.ts
-npx tsx examples/02-with-tools.ts
+npx tsx --env-file=.env examples/01-basic-loop.ts
+npx tsx --env-file=.env examples/02-with-tools.ts
 # ... and so on
 ```
 

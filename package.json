@@ -4,16 +4,16 @@
   "description": "Learn how to build an AI coding agent from scratch",
   "type": "module",
   "scripts": {
-    "example:01": "tsx examples/01-basic-loop.ts",
-    "example:02": "tsx examples/02-with-tools.ts",
-    "example:03": "tsx examples/03-with-edit.ts",
-    "example:04": "tsx examples/04-with-system-prompt.ts",
-    "example:05": "tsx examples/05-with-context.ts",
-    "example:06": "tsx examples/06-with-compression.ts",
-    "example:07": "tsx examples/07-with-permissions.ts",
-    "example:08": "tsx examples/08-with-subagents.ts",
-    "example:09": "tsx examples/09-with-streaming.ts",
-    "example:10": "tsx examples/10-with-concurrency.ts"
+    "example:01": "tsx --env-file=.env examples/01-basic-loop.ts",
+    "example:02": "tsx --env-file=.env examples/02-with-tools.ts",
+    "example:03": "tsx --env-file=.env examples/03-with-edit.ts",
+    "example:04": "tsx --env-file=.env examples/04-with-system-prompt.ts",
+    "example:05": "tsx --env-file=.env examples/05-with-context.ts",
+    "example:06": "tsx --env-file=.env examples/06-with-compression.ts",
+    "example:07": "tsx --env-file=.env examples/07-with-permissions.ts",
+    "example:08": "tsx --env-file=.env examples/08-with-subagents.ts",
+    "example:09": "tsx --env-file=.env examples/09-with-streaming.ts",
+    "example:10": "tsx --env-file=.env examples/10-with-concurrency.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
