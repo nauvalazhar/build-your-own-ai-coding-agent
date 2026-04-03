@@ -53,6 +53,8 @@ Open `.env` and add your API key.
 
 Inside `sample-project/` there is a small React app with a few components. Our agent will operate on these files throughout the guide. You do not need to run the React app. The agent just reads and edits the files.
 
+The sample project is intentionally tiny (3 files). This keeps token usage low. A typical session with the examples costs a few cents at most. When you try the examples, point the agent at `sample-project` in your prompts (e.g., "read the Button component in sample-project").
+
 ```
 sample-project/
 ├── src/
