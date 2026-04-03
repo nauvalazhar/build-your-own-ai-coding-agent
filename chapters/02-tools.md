@@ -29,17 +29,35 @@ Two turns. One tool call. The model decided to read the file, got the contents, 
 
 ## The tool interface
 
-Every tool needs three things:
+Every tool needs two things:
 
-1. **A definition** that tells the model what the tool does (name, description, input schema)
-2. **An implementation** that actually does the work (the code that runs)
-3. **Input validation** to make sure the model sent the right arguments
+1. **A definition** that tells the model what the tool does (name, description, and what input it accepts)
+2. **An implementation** that actually does the work
 
-Here is our tool interface:
+The definition is what the model sees. It uses JSON Schema to describe the input format. Here is what a `read_file` tool definition looks like when sent to the API:
+
+```json
+{
+  "name": "read_file",
+  "description": "Read the contents of a file.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "file_path": {
+        "type": "string",
+        "description": "The path to the file to read"
+      }
+    },
+    "required": ["file_path"]
+  }
+}
+```
+
+The model reads this and knows: "I can call `read_file` with a `file_path` string." That is all the model needs.
+
+On our side, we need to organize our tools and validate the input the model sends (it can make mistakes). We use a simple interface:
 
 ```typescript
-import { z } from "zod";
-
 interface Tool {
   name: string;
   description: string;
@@ -48,7 +66,9 @@ interface Tool {
 }
 ```
 
-The `inputSchema` uses Zod for validation. When the model calls a tool, we validate the input before running it. If the input is wrong, we send an error back instead of crashing.
+The `inputSchema` here uses [Zod](https://zod.dev/), a TypeScript validation library. We use it for two reasons: it validates the model's input at runtime (catching bad arguments before they cause errors), and we can convert it to the JSON Schema format the API expects. You could use plain JSON Schema instead, but Zod makes validation easier.
+
+When the model calls a tool, we validate the input with Zod first. If it is wrong, we send an error back instead of crashing.
 
 ## The essential tools
 
