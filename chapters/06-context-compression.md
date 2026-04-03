@@ -351,6 +351,8 @@ In practice, production agents do modify the conversation in place after compact
 
 Layer 1 prevents individual results from being too large. Layer 2 steadily shrinks the history as it grows. Layer 3 is the reset button when everything else is not enough.
 
+These three layers cover the core concepts. Production agents often have more. For example, they might drop middle turns entirely while keeping the first and last few (snipping), or collapse groups of related messages into summaries without re-summarizing the whole conversation. But truncation, clearing, and summarization are the foundation that everything else builds on.
+
 ## What is still missing
 
 Our agent runs anything the model asks it to. `rm -rf /`? Sure. `git push --force`? Why not. In the next chapter, we add a permission system that asks the user before running dangerous operations.
