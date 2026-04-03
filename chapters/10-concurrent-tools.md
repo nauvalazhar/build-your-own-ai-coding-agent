@@ -184,17 +184,17 @@ For learning purposes, batching is easier to understand. The queue approach is a
 ```mermaid
 flowchart LR
     subgraph "Batch 1 (parallel)"
-        R1[Read A]
-        R2[Read B]
-        S1[Search C]
+        R1["read_file(App.tsx)"]
+        R2["read_file(Button.tsx)"]
+        S1["search_files(className)"]
     end
 
     subgraph "Batch 2 (serial)"
-        E1[Edit D]
+        E1["edit_file(App.tsx)"]
     end
 
     subgraph "Batch 3 (parallel)"
-        R3[Read E]
+        R3["read_file(Header.tsx)"]
     end
 
     R1 --> E1
@@ -203,7 +203,7 @@ flowchart LR
     E1 --> R3
 ```
 
-Batch 1 runs all three tools at the same time. When all three are done, Batch 2 runs the edit alone. Then Batch 3 runs the final read.
+Batch 1 runs all three reads/searches at the same time. When all three are done, Batch 2 runs the edit alone. Then Batch 3 runs the final read.
 
 ## Order preservation
 
