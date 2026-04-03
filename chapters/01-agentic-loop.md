@@ -27,6 +27,28 @@ Eight turns. Seven of them are tool calls. Only the last one is actual text for 
 
 This is what "agentic" means. The model is not just answering a question. It is making decisions, taking actions, and repeating until the job is done.
 
+## What is a "tool"?
+
+Before we look at the loop, let's clarify what "tool" means here.
+
+When you call the Claude API, you can tell the model about functions it is allowed to use. "You have a function called `read_file` that takes a file path and returns the file contents." These functions are called **tools**.
+
+The model does not run the tools itself. It can only *ask* you to run them. When the model decides it needs to read a file, it responds with a special block called `tool_use`:
+
+```json
+{
+  "type": "tool_use",
+  "name": "read_file",
+  "input": { "file_path": "src/App.tsx" }
+}
+```
+
+This is the model saying: "I want to call `read_file` with this input. Please run it and tell me the result."
+
+Your code then executes the function, gets the result, and sends it back to the model as a `tool_result` block. The model reads the result and decides what to do next. Maybe it calls another tool. Maybe it responds with text.
+
+That is the whole mechanism. The model asks, you execute, you report back. The loop below automates this cycle.
+
 ## The loop
 
 The whole thing is a `while(true)` loop. Here it is:
