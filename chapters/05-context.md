@@ -166,12 +166,13 @@ function normalizeMessages(
 }
 ```
 
-In production agents, normalization is much more involved. It handles things like:
+In production agents, normalization is much more involved. Here are some common things it handles:
 
-- Making sure every `tool_use` block has a matching `tool_result`
-- Removing internal metadata that should not be sent to the API
-- Merging consecutive messages from the same role
-- Stripping UI-only messages
+- **Orphaned tool calls.** If the model called a tool but the execution was interrupted (user cancelled, error, timeout), you have a `tool_use` block with no matching `tool_result`. The API rejects this. Normalization inserts a synthetic error result like `"[Tool result missing due to interruption]"` so the messages stay valid.
+
+- **Consecutive same-role messages.** Some APIs require messages to alternate between `user` and `assistant`. If two user messages end up next to each other (e.g., a tool result followed by a new user prompt), they need to be merged into one.
+
+- **Oversized tool results.** A file read that returned 10,000 lines is still in the conversation from 20 turns ago. Normalization can truncate or replace it with a summary. (We cover this in detail in the next chapter.)
 
 For now, basic filtering is enough. We will add more as we need it.
 
