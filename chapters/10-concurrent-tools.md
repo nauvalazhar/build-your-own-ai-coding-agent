@@ -213,13 +213,13 @@ Even though tools in a concurrent batch finish at different times, results must 
 
 ```typescript
 const results = await Promise.all([
-  readFile("A.tsx"),  // Finishes 3rd (slow file)
-  readFile("B.tsx"),  // Finishes 1st (small file)
-  searchFiles("C"),   // Finishes 2nd
+  read_file("src/App.tsx"),              // Finishes 3rd (large file)
+  read_file("src/components/Button.tsx"), // Finishes 1st (small file)
+  search_files("className"),             // Finishes 2nd
 ]);
 
-// results[0] = A.tsx contents (matches input order)
-// results[1] = B.tsx contents
+// results[0] = App.tsx contents (matches input order, not finish order)
+// results[1] = Button.tsx contents
 // results[2] = search results
 ```
 
@@ -227,7 +227,7 @@ const results = await Promise.all([
 
 When a tool in a batch fails, what happens to the other tools?
 
-For read-only tools, errors are independent. If Read A fails but Read B succeeds, there is no problem. Return the error for A and the result for B.
+For read-only tools, errors are independent. If `read_file("App.tsx")` fails but `read_file("Button.tsx")` succeeds, there is no problem. Return the error for one and the result for the other.
 
 For shell commands, it is different. If a batch contained a `run_command` that fails (like a build step), sibling tools running in the same batch might be in an inconsistent state. Production agents abort sibling tools when a shell command fails.
 
