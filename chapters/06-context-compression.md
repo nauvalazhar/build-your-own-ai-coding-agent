@@ -363,4 +363,10 @@ Our agent runs anything the model asks it to. `rm -rf /`? Sure. `git push --forc
 npm run example:06
 ```
 
-Have a long conversation (10+ turns) and watch the `[context]` log. You will see the token count grow, then drop when compression kicks in. Try reading several large files to trigger the threshold faster.
+**Heads up:** This example has a low compact threshold (8,000 tokens) for demo purposes. A longer conversation with bigger files will trigger all three layers. But even short conversations cost more than earlier examples because of context re-sending. Expect to spend $0.20-0.50 if you have a long session.
+
+Watch the `[context]` log as you chat. You will see token counts go up as you read files, then drop when Layer 2 (clearing) kicks in. That drop is old tool results being replaced with "[Cleared]".
+
+To trigger Layer 3 (the `[compact] Summarizing conversation...` log), you need the token count to exceed 8,000. With the small sample project, this takes many turns. Try asking the agent to read the example files in `examples/` instead, since those are much larger.
+
+If you only see token counts going down without the `[compact]` log, that is Layer 2 working silently. Layer 3 only fires when Layer 2 is not enough.
