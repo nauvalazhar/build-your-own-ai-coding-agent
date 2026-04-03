@@ -138,7 +138,38 @@ function clearOldResults(
 }
 ```
 
-This is more aggressive than truncation. Old tool results are completely replaced. But the tool call itself (the `tool_use` block in the assistant message) stays intact. The model can still see what it did. It just cannot see the full result anymore.
+Here is what this looks like. Say the conversation has 10 tool results and we keep the last 6:
+
+```
+Before clearing:
+┌─────────────────────────────────────────────────────────────┐
+│ [tool_result] list_files    → "src/App.tsx\nsrc/Button..."  │ ← old, clear
+│ [tool_result] read_file     → "1  import React...(800 lines)"│ ← old, clear
+│ [tool_result] read_file     → "1  export function...(200 l)"│ ← old, clear
+│ [tool_result] search_files  → "src/App.tsx:3: import..."    │ ← old, clear
+│ [tool_result] edit_file     → "Edited src/App.tsx"          │ ← keep (recent 6)
+│ [tool_result] read_file     → "1  import express...(500 l)" │ ← keep
+│ [tool_result] search_files  → "src/routes.ts:12: app.get..."│ ← keep
+│ [tool_result] read_file     → "1  const router...(300 l)"  │ ← keep
+│ [tool_result] edit_file     → "Edited src/routes.ts"        │ ← keep
+│ [tool_result] run_command   → "Tests passed"                │ ← keep
+└─────────────────────────────────────────────────────────────┘
+
+After clearing:
+┌─────────────────────────────────────────────────────────────┐
+│ [tool_result] list_files    → "[Cleared]"                   │ ← was 500 chars
+│ [tool_result] read_file     → "[Cleared]"                   │ ← was 20,000 chars
+│ [tool_result] read_file     → "[Cleared]"                   │ ← was 5,000 chars
+│ [tool_result] search_files  → "[Cleared]"                   │ ← was 2,000 chars
+│ [tool_result] edit_file     → "Edited src/App.tsx"          │ ← unchanged
+│ [tool_result] read_file     → "1  import express...(500 l)" │ ← unchanged
+│ ... (rest unchanged)                                        │
+└─────────────────────────────────────────────────────────────┘
+```
+
+The old file contents (27,500 characters) are gone. But the tool calls in the assistant messages still say "I called read_file on src/App.tsx." The model can see *what* it did, just not the full result. If it needs that file again, it can re-read it.
+
+This is more aggressive than truncation. Old tool results are completely replaced.
 
 **When it fires:** Every turn, before sending to the API.
 
