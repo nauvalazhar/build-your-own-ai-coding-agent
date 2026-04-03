@@ -238,7 +238,19 @@ const writeFileTool: Tool = {
 
 ## Wiring tools into the loop
 
-Now we connect the tools to our agentic loop from Chapter 1. Two things change:
+Now we connect the tools to our agentic loop from Chapter 1. First, collect all tools into an array:
+
+```typescript
+const tools: Tool[] = [
+  readFileTool,
+  writeFileTool,
+  listFilesTool,
+  searchFilesTool,
+  runCommandTool,
+];
+```
+
+Then two things change:
 
 **1. Register tools with the API.** We convert our Zod schemas to JSON Schema and pass them in the `tools` parameter:
 
