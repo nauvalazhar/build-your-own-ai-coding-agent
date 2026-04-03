@@ -1,0 +1,26 @@
+{
+  "name": "build-your-own-ai-coding-agent",
+  "version": "1.0.0",
+  "description": "Learn how to build an AI coding agent from scratch",
+  "type": "module",
+  "scripts": {
+    "example:01": "tsx examples/01-basic-loop.ts",
+    "example:02": "tsx examples/02-with-tools.ts",
+    "example:03": "tsx examples/03-with-edit.ts",
+    "example:04": "tsx examples/04-with-system-prompt.ts",
+    "example:05": "tsx examples/05-with-context.ts",
+    "example:06": "tsx examples/06-with-compression.ts",
+    "example:07": "tsx examples/07-with-permissions.ts",
+    "example:08": "tsx examples/08-with-subagents.ts",
+    "example:09": "tsx examples/09-with-streaming.ts",
+    "example:10": "tsx examples/10-with-concurrency.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}
