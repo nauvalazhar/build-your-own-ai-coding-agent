@@ -159,7 +159,7 @@ Here is a subtle problem. Sometimes the model outputs curly quotes ( \u201c \u20
 The fix: try the exact match first. If it fails, normalize both the search string and the file content (convert all curly quotes to straight quotes), and try again. If the normalized version matches, use the position from the normalized match to find the original text in the file.
 
 ```typescript
-function findString(fileContent: string, searchString: string): string | null {
+function findActualString(fileContent: string, searchString: string): string | null {
   // Try exact match first
   if (fileContent.includes(searchString)) {
     return searchString;
