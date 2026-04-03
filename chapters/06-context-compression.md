@@ -49,7 +49,31 @@ function truncateResult(result: string): string {
 }
 ```
 
-This runs on every tool result as it is created. It is free (no extra API calls) and catches the biggest offenders.
+Here is what this looks like in practice. The model reads a large file:
+
+```
+Before truncation (25,000 characters):
+┌─────────────────────────────────────┐
+│ 1   import express from "express";  │
+│ 2   import cors from "cors";        │
+│ 3   ...                             │
+│ ... (500 more lines)                │
+│ 502 export default app;             │
+└─────────────────────────────────────┘
+
+After truncation (10,000 characters):
+┌─────────────────────────────────────┐
+│ 1   import express from "express";  │
+│ 2   import cors from "cors";        │
+│ 3   ...                             │
+│ ... (first ~200 lines)              │
+│                                     │
+│ [Truncated: result was 25,000       │
+│  characters. Showing first 10,000.] │
+└─────────────────────────────────────┘
+```
+
+The model sees enough of the file to understand its structure (imports, exports, main patterns) without the full 500 lines eating up context. If it needs a specific section later, it can read the file again with an offset.
 
 **When it fires:** Every turn, on every tool result.
 
@@ -189,18 +213,49 @@ The old messages are gone. Replaced by a summary that preserves the important fa
 
 ## The compact boundary
 
-After compaction, we need to know where the summary ends and the real conversation begins. This is the "compact boundary." Everything before the boundary is summarized history. Everything after is live conversation.
+After compaction, the messages array has a summary at the front and recent messages at the back. But the conversation keeps going. New messages pile up. Eventually you need to compact again.
 
-On the next compaction cycle, we only summarize messages after the previous boundary. This prevents re-summarizing the same content.
+The question is: which messages do you summarize the second time? You do not want to re-summarize the summary. That would lose information with each cycle (a summary of a summary of a summary gets worse every time).
+
+The "compact boundary" is a marker that says "everything before this point is already summarized." When it is time to compact again, you only summarize messages after the boundary.
+
+Here is what the messages array looks like over time:
+
+```
+After first compaction:
+┌──────────────────────────────────────────────────┐
+│ [summary of turns 1-20]          ← boundary here │
+│ [assistant] "I understand."                      │
+│ [user] "Now add a delete button"                 │
+│ [assistant] [tool] read_file(...)                │
+│ [tool_result] (file contents)                    │
+│ [assistant] [tool] edit_file(...)                │
+│ [tool_result] "Edited"                           │
+│ ... 15 more turns ...                            │
+└──────────────────────────────────────────────────┘
+
+After second compaction:
+┌──────────────────────────────────────────────────┐
+│ [summary of turns 1-20]                          │
+│ [summary of turns 21-35]         ← boundary here │
+│ [assistant] "I understand."                      │
+│ [user] "One more thing..."                       │
+│ ... recent turns ...                             │
+└──────────────────────────────────────────────────┘
+```
+
+The first summary stays untouched. The second compaction only summarized the new turns (21-35). This way, information degrades gracefully instead of collapsing into a single increasingly lossy summary.
+
+In code:
 
 ```typescript
-// Simple version: track the index where compacted content ends
+// Track where the last compaction ended
 let compactBoundaryIndex = 0;
 
 // After compaction:
-compactBoundaryIndex = 2; // Summary message + "I understand" message
+compactBoundaryIndex = 2; // Summary + "I understand" message
 
-// Next time we need to compact, start from compactBoundaryIndex
+// Next time we compact, only summarize messages after the boundary
 const messagesToSummarize = messages.slice(compactBoundaryIndex);
 ```
 
