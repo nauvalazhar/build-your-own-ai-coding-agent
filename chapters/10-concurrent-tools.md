@@ -14,7 +14,16 @@ In the previous chapters, the model usually calls one tool per turn. It calls `r
 }
 ```
 
-The model is saying: "I need all three files. Get them for me." Our loop already handles this. It collects all `tool_use` blocks and executes them. But right now it runs them one at a time. Each file read takes 50ms. Three reads: 150ms. If we run them at the same time: 50ms. Three times faster.
+The model is saying: "I need all three files. Get them for me." Our loop already handles this. Remember the `for` loop from Chapter 1 that executes each tool?
+
+```typescript
+for (const toolUse of toolUseBlocks) {
+  const result = await tool.call(toolUse.input);  // waits for each one
+  toolResults.push({ ... });
+}
+```
+
+It runs them one at a time because of `await`. Each tool waits for the previous one to finish. Each file read takes 50ms. Three reads: 150ms. If we run them at the same time: 50ms. Three times faster.
 
 But what about `edit_file`? If two edits target the same file, running them in parallel could corrupt the file. One edit might overwrite the other.
 
