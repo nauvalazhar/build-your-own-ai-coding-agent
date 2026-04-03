@@ -97,10 +97,8 @@ for await (const event of stream) {
 
   if (event.type === "content_block_stop") {
     // Now we can parse the complete JSON
-    if (toolInputBuffer) {
-      const input = JSON.parse(toolInputBuffer);
-      // Execute the tool with the parsed input
-    }
+    const input = toolInputBuffer ? JSON.parse(toolInputBuffer) : {};
+    // Execute the tool with the parsed input
   }
 }
 ```
@@ -153,14 +151,15 @@ async function agentLoop(messages: Anthropic.MessageParam[]): Promise<string> {
           break;
 
         case "content_block_stop":
-          if (currentToolInput) {
+          if (currentToolId) {
             contentBlocks.push({
               type: "tool_use",
               id: currentToolId,
               name: currentToolName,
-              input: JSON.parse(currentToolInput),
+              input: currentToolInput ? JSON.parse(currentToolInput) : {},
             });
             currentToolInput = "";
+            currentToolId = "";
           }
           break;
       }

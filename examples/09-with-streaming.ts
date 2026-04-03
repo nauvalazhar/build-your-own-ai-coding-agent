@@ -208,13 +208,13 @@ async function agentLoop(
           break;
 
         case "content_block_stop":
-          if (currentBlockType === "tool_use" && currentToolInput) {
+          if (currentBlockType === "tool_use") {
             try {
               contentBlocks.push({
                 type: "tool_use",
                 id: currentToolId,
                 name: currentToolName,
-                input: JSON.parse(currentToolInput),
+                input: currentToolInput ? JSON.parse(currentToolInput) : {},
               });
             } catch {
               contentBlocks.push({
