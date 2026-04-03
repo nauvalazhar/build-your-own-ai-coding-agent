@@ -183,7 +183,15 @@ async function askPermission(
 }
 ```
 
-The "always" option adds a session rule so the user does not get asked again for the same tool. This is convenient for repetitive operations. The rule lasts for the current session only.
+The "always" option adds a session rule so the user does not get asked again for the same tool. This is convenient for repetitive operations. In our example, the rule lasts for the current session only (stored in memory).
+
+Production agents take this further. They let users save rules to different places:
+
+- **Session** - in memory, gone when the session ends
+- **Project settings** - saved to a file in the project (e.g., `.claude/settings.json`), shared with the team
+- **User settings** - saved to a global config file (e.g., `~/.claude/settings.json`), applies to all projects
+
+This way, a user can say "always allow `npm test` in this project" and it persists across sessions.
 
 ## The permission check flow
 
