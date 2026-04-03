@@ -6,6 +6,29 @@ Our agent can search, read, and edit files. But it does not always make smart ch
 
 The model is powerful, but it needs instructions on *how* to use that power. That is what the system prompt does.
 
+## What is a system prompt?
+
+When you call an LLM API, you can send three kinds of content:
+
+- **System prompt**: Instructions that define how the model should behave. The model reads these before anything else. Think of it as the model's job description.
+- **User messages**: What the user says.
+- **Assistant messages**: What the model previously said (conversation history).
+
+The system prompt is where you put rules like "always read a file before editing it" or "be concise." The user never sees the system prompt. The model sees it on every API call.
+
+A simple example:
+
+```typescript
+const response = await client.messages.create({
+  model: "claude-sonnet-4-20250514",
+  max_tokens: 4096,
+  system: "You are a coding assistant. Be concise.",  // <-- system prompt
+  messages: conversationHistory,
+});
+```
+
+That one line changes how the model responds. Without it, the model is a general assistant. With it, the model knows it is a coding assistant and should keep things short. The more specific your instructions, the more predictable the behavior.
+
 ## Walkthrough: How does the model know which file to edit?
 
 A user types: "Fix the login bug."
@@ -115,21 +138,9 @@ This is about 50 lines. Production agents have system prompts that are thousands
 
 **"Communication"** keeps the output focused. Without this, the model tends to explain every single step in detail, which gets noisy.
 
-## How the system prompt is sent
+## The system prompt is sent every turn
 
-The system prompt goes in the `system` parameter of the API call. It is separate from the conversation messages:
-
-```typescript
-const response = await client.messages.create({
-  model: "claude-sonnet-4-20250514",
-  max_tokens: 4096,
-  system: SYSTEM_PROMPT,  // <-- system prompt goes here
-  tools: apiTools,
-  messages: conversationHistory,
-});
-```
-
-The system prompt is sent with every API call. The model sees it at the start of every turn. This is important because the agentic loop makes multiple API calls per user message. The model needs the instructions fresh each time.
+One thing to remember: the agentic loop makes multiple API calls per user message (one for each tool call cycle). The system prompt is sent with every one of those calls. The model sees it fresh each time. This means your rules are always in front of the model, even on turn 15 of a long conversation.
 
 ## Adding tool-specific hints
 
