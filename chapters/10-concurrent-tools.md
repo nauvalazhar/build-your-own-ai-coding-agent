@@ -115,6 +115,12 @@ async function executeBatches(batches: Batch[]): Promise<ToolResult[]> {
 }
 ```
 
+Our batch approach is simple and works well. Production agents often use a different mechanism: a **queue**. Instead of pre-grouping tools into batches, they walk through a list of queued tools and start each one if conditions allow. "Can this tool run right now?" If all currently running tools are safe and this one is also safe, start it. If not, wait.
+
+The result is the same (safe tools run together, unsafe tools run alone) but the queue approach handles tools that arrive mid-execution better, since streaming can deliver tool calls one at a time while earlier tools are still running.
+
+For learning purposes, batching is easier to understand. The queue approach is an optimization you can switch to later.
+
 ## Visualized
 
 ```mermaid
