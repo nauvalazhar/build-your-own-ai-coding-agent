@@ -247,19 +247,6 @@ const results = await Promise.all(
 
 Each tool call is wrapped in a try/catch. A failure in one does not affect the others.
 
-## Performance impact
-
-The improvement depends on the workload:
-
-| Scenario | Sequential | Concurrent | Speedup |
-|---|---|---|---|
-| Read 3 small files | 150ms | 50ms | 3x |
-| Read + Search + List | 200ms | 80ms | 2.5x |
-| Read 1 file, Edit 1 file | 100ms | 100ms | 1x (cannot parallelize) |
-| 5 reads + 1 edit + 3 reads | 450ms | 200ms | 2.25x |
-
-The bigger the batch of concurrent-safe tools, the bigger the win. If the model calls mostly reads and searches (which is common during exploration), concurrency makes a noticeable difference.
-
 ## Wiring it into the loop
 
 In previous chapters, we executed tools one at a time in a `for` loop. Now we replace that with batch execution. The change is small:
@@ -283,6 +270,19 @@ const toolResults = await executeBatches(batches);
 ```
 
 Everything else in the agentic loop stays the same. The tool results still get pushed into the conversation as a user message. The loop still checks for tool_use blocks to decide whether to continue. The only difference is how the tools are executed between those steps.
+
+## Performance impact
+
+The improvement depends on the workload:
+
+| Scenario | Sequential | Concurrent | Speedup |
+|---|---|---|---|
+| Read 3 small files | 150ms | 50ms | 3x |
+| Read + Search + List | 200ms | 80ms | 2.5x |
+| Read 1 file, Edit 1 file | 100ms | 100ms | 1x (cannot parallelize) |
+| 5 reads + 1 edit + 3 reads | 450ms | 200ms | 2.25x |
+
+The bigger the batch of concurrent-safe tools, the bigger the win. If the model calls mostly reads and searches (which is common during exploration), concurrency makes a noticeable difference.
 
 ## What is still missing
 
