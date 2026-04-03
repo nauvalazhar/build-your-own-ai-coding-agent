@@ -68,7 +68,7 @@ Not everything is isolated. Some things need to be shared:
 | Component | Shared or Isolated | Why |
 |---|---|---|
 | **Messages** | Isolated | The whole point. Keep contexts separate. |
-| **File read cache** | Shared | If the parent read a file, the subagent should know it was read (for staleness checks). |
+| **File read cache** | Cloned | The subagent gets a copy of what the parent has read so far (for staleness checks). New reads by the subagent do not flow back to the parent. |
 | **Tools** | Shared | Both use the same tools. |
 | **Abort signal** | Linked | If the user cancels, both parent and child should stop. |
 | **Permission rules** | Shared | If the user said "always allow edit_file," that applies to subagents too. |
