@@ -222,6 +222,37 @@ const finalMessage = await stream.finalMessage();
 
 This is easier for simple cases. For our agentic loop, we need more control (to detect tool_use blocks during streaming), so we use the raw event approach.
 
+## Streaming thinking blocks
+
+Many LLMs now support "thinking" or "reasoning" where the model shows its thought process before responding. When enabled, the model produces a `thinking` content block before the `text` or `tool_use` blocks.
+
+Thinking blocks stream the same way as text, just with a different delta type:
+
+- `content_block_start` with `type: "thinking"` signals a thinking block
+- `content_block_delta` with `type: "thinking_delta"` carries chunks of the model's reasoning
+- `content_block_stop` ends the thinking block
+
+```typescript
+case "content_block_start":
+  if (event.content_block.type === "thinking") {
+    // A thinking block is starting
+    console.log("  [thinking...]");
+  }
+  break;
+
+case "content_block_delta":
+  if (event.delta.type === "thinking_delta") {
+    // The model is reasoning. You can show this or hide it.
+    // Some agents show a spinner, some show the full thought process.
+    process.stdout.write(event.delta.thinking);
+  }
+  break;
+```
+
+Whether to show thinking to the user is a design choice. Some agents display it in a collapsible section. Some show a spinner with "Thinking..." and hide the content. Some skip it entirely. The thinking block does not need to go into the conversation history for the agentic loop to work. It is the `text` and `tool_use` blocks that matter.
+
+One thing to note: some providers also have "redacted thinking" blocks where the model thought about something but the content is hidden from you. You get a block with `type: "redacted_thinking"` but no actual text. Just acknowledge it and move on.
+
 ## What is still missing
 
 When the model calls 3 tools at once (like reading 3 files), we execute them one at a time. But Read is a safe, read-only operation. We could run all 3 in parallel and save time. That is the topic of the next chapter.
