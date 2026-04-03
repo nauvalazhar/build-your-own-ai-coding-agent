@@ -2,7 +2,19 @@
 
 ## The problem
 
-The model calls `read_file` on three different files in a single response. Each file read takes 50ms. Running them one at a time: 150ms. Running them all at once: 50ms. Three times faster.
+In the previous chapters, the model usually calls one tool per turn. It calls `read_file`, gets the result, then decides what to do next. But the model can also call **multiple tools in a single turn**. Instead of one `tool_use` block in the response, it returns several:
+
+```json
+{
+  "content": [
+    { "type": "tool_use", "name": "read_file", "input": { "file_path": "A.tsx" } },
+    { "type": "tool_use", "name": "read_file", "input": { "file_path": "B.tsx" } },
+    { "type": "tool_use", "name": "read_file", "input": { "file_path": "C.tsx" } }
+  ]
+}
+```
+
+The model is saying: "I need all three files. Get them for me." Our loop already handles this. It collects all `tool_use` blocks and executes them. But right now it runs them one at a time. Each file read takes 50ms. Three reads: 150ms. If we run them at the same time: 50ms. Three times faster.
 
 But what about `edit_file`? If two edits target the same file, running them in parallel could corrupt the file. One edit might overwrite the other.
 
