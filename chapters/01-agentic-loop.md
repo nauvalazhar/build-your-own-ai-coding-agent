@@ -45,28 +45,42 @@ The model does not run the tools itself. It can only *ask* you to run them. When
 
 This is the model saying: "I want to call `read_file` with this input. Please run it and tell me the result."
 
-Your code then executes the function, gets the result, and sends it back to the model as a `tool_result` block. What does "execute the function" look like? In practice, each tool is an object with a `name` and a `call()` method. You keep them in an array, find the right one by name, and call it:
+Your code then executes the function, gets the result, and sends it back to the model as a `tool_result` block. What does "execute the function" look like? At its simplest, it is just a function:
 
 ```typescript
-// Each tool is an object
-const readFileTool = {
-  name: "read_file",
-  async call(input) {
+function executeTool(name: string, input: Record<string, string>): string {
+  if (name === "read_file") {
     return fs.readFileSync(input.file_path, "utf-8");
+  }
+  if (name === "list_files") {
+    return fs.readdirSync(input.directory).join("\n");
+  }
+  return "Unknown tool";
+}
+```
+
+A tool is just a function. The model says "call `read_file` with this path", your code reads the file from disk, and you send the contents back. Nothing more.
+
+In a larger app, you probably do not want a growing if/else chain. A common pattern is to put each tool in an object with a `name` and a `call()` method, then keep them in an array:
+
+```typescript
+const tools = [
+  {
+    name: "read_file",
+    async call(input) { return fs.readFileSync(input.file_path, "utf-8"); },
   },
-};
+  {
+    name: "list_files",
+    async call(input) { return fs.readdirSync(input.directory).join("\n"); },
+  },
+];
 
-// All tools live in an array (the registry)
-const tools = [readFileTool, listFilesTool, searchFilesTool];
-
-// When the model asks for a tool, find it by name and call it
+// Find the right tool by name and call it
 const tool = tools.find(t => t.name === toolUse.name);
 const result = await tool.call(toolUse.input);
 ```
 
-That is it. A tool is an object with a function. The model says "call `read_file` with this path", your code finds the matching tool, runs it, and sends the result back. The model reads the result and decides what to do next. Maybe it calls another tool. Maybe it responds with text.
-
-We will build proper tools in Chapter 2. For now, just know that a tool is a function the model can ask you to run. The loop below automates this cycle.
+This is the pattern we will use from Chapter 2 onward. But the core idea is the same either way: the model asks for a function by name, you run it, you send the result back. The loop below automates this cycle.
 
 ## The loop
 
