@@ -76,7 +76,7 @@ npm run example:01
 
 The examples build on each other. Example 02 adds tools to the loop from example 01. Example 03 adds the edit tool on top of that. And so on.
 
-**How chapters and examples relate:** Each chapter explains the concepts and shows the important code, but does not walk through every line. The examples are complete, runnable files that include things like imports, error handling, and REPL setup that the chapters skip over. Think of the chapters as the "why and how" and the examples as the "full working version." Read the chapter first to understand the concept, then look at the example to see it all put together.
+**How chapters and examples relate:** Each chapter explains the concepts and shows the important code. At the end of each chapter, there is a "The full code" section with the complete, runnable code for that chapter. This is the same code as the matching file in `examples/`. You can read it in the chapter or run it from the command line.
 
 One thing to note: some later examples focus on their chapter's concept and do not carry forward every feature from previous chapters. For example, the streaming example (09) does not include the permission system from Chapter 7. This is intentional to keep each example focused and readable. Each example file has a comment at the top noting which features are included and which are omitted. In a real agent, you would combine all of them.
 
