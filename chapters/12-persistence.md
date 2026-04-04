@@ -87,37 +87,41 @@ function loadSession(): Anthropic.MessageParam[] {
 }
 ```
 
-When the user types `/resume`, load the messages and continue:
+When the user types `/resume`, load the messages and continue. This goes in the REPL input handler, before the user's input is sent to the agentic loop:
 
 ```typescript
-if (userInput === "/resume") {
-  const loaded = loadSession();
-  if (loaded.length === 0) {
-    console.log("No previous session found.");
-  } else {
-    conversationHistory.push(...loaded);
-    console.log(`Loaded ${loaded.length} messages from previous session.`);
+// In the REPL, where you read user input:
+rl.question("> ", async (userInput) => {
+  // Handle commands before sending to the agent
+  if (userInput === "/resume") {
+    const loaded = loadSession();
+    if (loaded.length === 0) {
+      console.log("No previous session found.");
+    } else {
+      conversationHistory.push(...loaded);
+      console.log(`Loaded ${loaded.length} messages from previous session.`);
+    }
+    return ask(); // Go back to the prompt, do not send to the agent
   }
-  continue;
-}
+
+  if (userInput === "/new") {
+    if (fs.existsSync(SESSION_FILE)) fs.unlinkSync(SESSION_FILE);
+    conversationHistory.length = 0;
+    console.log("Started new session.");
+    return ask();
+  }
+
+  // Normal input: save and send to the agent
+  conversationHistory.push({ role: "user", content: userInput });
+  saveMessage({ role: "user", content: userInput });
+  const response = await agentLoop(conversationHistory);
+  // ...
+});
 ```
 
-The model now sees the entire previous conversation. It can reference files it read, edits it made, and decisions from the last session.
+The `/resume` and `/new` commands are intercepted before the input reaches the agent. They are not tool calls. They are REPL commands that modify the conversation history directly.
 
-### Starting fresh
-
-If the user wants a new session instead of resuming, delete the old file:
-
-```typescript
-if (userInput === "/new") {
-  if (fs.existsSync(SESSION_FILE)) {
-    fs.unlinkSync(SESSION_FILE);
-  }
-  conversationHistory.length = 0;
-  console.log("Started new session.");
-  continue;
-}
-```
+After `/resume`, the model sees the entire previous conversation on the next turn. It can reference files it read, edits it made, and decisions from the last session.
 
 ## Project instructions
 
