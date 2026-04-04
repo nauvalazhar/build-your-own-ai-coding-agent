@@ -205,7 +205,7 @@ const memoryTool: Tool = {
 };
 ```
 
-On startup, load the memory file and add it to the system context:
+On startup, load the memory file and add it to the system prompt. We can put all of this together in one function that builds the full system prompt from all sources:
 
 ```typescript
 function loadMemory(): string | null {
@@ -213,13 +213,27 @@ function loadMemory(): string | null {
   return fs.readFileSync(MEMORY_FILE, "utf-8");
 }
 
-const memory = loadMemory();
-const fullSystemPrompt = [
-  SYSTEM_PROMPT,
-  projectInstructions ? `# Project Instructions\n${projectInstructions}` : "",
-  memory ? `# Memory (from previous sessions)\n${memory}` : "",
-].filter(Boolean).join("\n\n");
+function buildSystemPrompt(): string {
+  const base = `You are a coding assistant. You can read, search, and edit local files.
+Use save_memory to remember important things about the user or project.`;
+
+  const parts = [base];
+
+  const instructions = loadProjectInstructions();
+  if (instructions) {
+    parts.push(`# Project Instructions (from AGENT.md)\n${instructions}`);
+  }
+
+  const memory = loadMemory();
+  if (memory) {
+    parts.push(`# Memory (from previous sessions)\n${memory}`);
+  }
+
+  return parts.join("\n\n");
+}
 ```
+
+Call `buildSystemPrompt()` on each turn (not once at startup) so that new memories saved during the session are included in the next API call.
 
 The agent sees its own past notes every session. Over time, the memory file builds up a picture of the user and the project:
 
