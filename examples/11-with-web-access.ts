@@ -242,6 +242,57 @@ const tools: Tool[] = [
       }
     },
   },
+
+  // --- Web search tool (new in this chapter) ---
+  // Uses Anthropic's built-in server-side web search.
+  // The search happens on Anthropic's servers. No external API key needed.
+  {
+    name: "web_search",
+    description:
+      "Search the web and return results with titles and URLs. " +
+      "Use this to find documentation, solutions, or references online.",
+    inputSchema: z.object({
+      query: z.string().describe("The search query"),
+    }),
+    isConcurrencySafe: true,
+    async call(input) {
+      const query = input.query as string;
+
+      try {
+        // Make a separate API call with the server-side web search tool
+        const response = await client.messages.create({
+          model: "claude-haiku-4-5-20251001",
+          max_tokens: 1024,
+          system: "Perform the web search and return the results.",
+          tools: [
+            { type: "web_search_20250305", name: "web_search", max_uses: 5 } as any,
+          ],
+          messages: [
+            { role: "user", content: `Search the web for: ${query}` },
+          ],
+        });
+
+        // Extract results from the response
+        const parts: string[] = [];
+        for (const block of response.content) {
+          if ((block as any).type === "web_search_tool_result") {
+            const content = (block as any).content;
+            if (Array.isArray(content)) {
+              for (const result of content) {
+                parts.push(`- ${result.title}: ${result.url}`);
+              }
+            }
+          } else if (block.type === "text") {
+            parts.push(block.text);
+          }
+        }
+
+        return parts.join("\n") || "No results found.";
+      } catch (e: any) {
+        return `Error searching: ${e.message}`;
+      }
+    },
+  },
 ];
 
 const apiTools: Anthropic.Tool[] = tools.map((t) => ({
@@ -394,6 +445,7 @@ async function main() {
 
   console.log("Agent with web access. Try:");
   console.log('  "Fetch https://example.com and tell me what it says"');
+  console.log('  "Search the web for how to use React useEffect"');
   console.log('  "What is on the Anthropic docs homepage?"\n');
 
   const ask = () => {

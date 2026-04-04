@@ -183,36 +183,56 @@ The cache lasts for the session. When the agent restarts, the cache is empty. Th
 
 ## Web search
 
-Search is trickier than fetching because you need a search provider. There are a few options:
+Search is trickier than fetching. You need a search backend. There are two approaches:
 
-- **API-based**: Use a search API like Google Custom Search, Bing Search, or Brave Search. These require API keys and have rate limits.
-- **Server-side**: Some LLM providers offer built-in web search as a server-side tool. The search happens on the provider's side, and you get results back.
+- **External API**: Use a search API like Google Custom Search, Bing Search, or Brave Search. These require separate API keys and have rate limits.
+- **Built-in server-side**: Some LLM providers offer web search as a built-in feature. You pass a special tool definition in your API call, and the provider performs the search on their side.
 
-For our example, we will keep search simple. We build the tool interface but acknowledge that the search backend depends on what API you have access to:
+Our examples use the Anthropic SDK, which supports built-in web search. You pass a `web_search` tool in the API call, and Claude searches the web server-side. No extra API key needed.
+
+The idea is simple: instead of our agent calling the search tool, we make a separate API call to Claude with the web search tool enabled. Claude performs the search and returns the results. Our agent then parses those results.
 
 ```typescript
 const webSearchTool: Tool = {
   name: "web_search",
-  description: "Search the web and return a list of results with titles and URLs.",
+  description: "Search the web and return results with titles and URLs.",
   inputSchema: z.object({
     query: z.string().describe("The search query"),
   }),
   async call(input) {
     const query = input.query as string;
 
-    // This is where you would call a search API.
-    // For example, with Brave Search:
-    // const results = await braveSearch(query);
+    // Make a separate API call with the server-side web search tool
+    const response = await client.messages.create({
+      model: "claude-haiku-4-5-20251001",
+      max_tokens: 1024,
+      system: "Perform the web search and return the results.",
+      tools: [{ type: "web_search_20250305", name: "web_search", max_uses: 5 }],
+      messages: [{ role: "user", content: `Search the web for: ${query}` }],
+    });
 
-    // For now, return a message explaining how to set this up
-    return "Web search requires a search API key (Google, Bing, or Brave). " +
-      "Configure one and replace this placeholder. " +
-      "The tool should return titles and URLs that the model can then fetch.";
+    // Extract search results and text from the response
+    const parts: string[] = [];
+    for (const block of response.content) {
+      if (block.type === "web_search_tool_result") {
+        if (Array.isArray(block.content)) {
+          for (const result of block.content) {
+            parts.push(`- ${result.title}: ${result.url}`);
+          }
+        }
+      } else if (block.type === "text") {
+        parts.push(block.text);
+      }
+    }
+
+    return parts.join("\n") || "No results found.";
   },
 };
 ```
 
-The pattern is the same either way: the model calls `web_search`, gets back titles and URLs, and then uses `web_fetch` to read the pages that look relevant. Search finds the pages. Fetch reads them.
+The model gets back titles, URLs, and sometimes a text summary. It can then use `web_fetch` on any URL that looks relevant. Search finds the pages. Fetch reads them.
+
+If you are using a different LLM provider, replace this with their equivalent. OpenAI has a similar server-side search feature. Or use an external API like Brave Search and parse the JSON response yourself.
 
 ## Permissions
 
@@ -238,6 +258,5 @@ npm run example:11
 
 Try:
 - "Fetch https://example.com and tell me what it says"
+- "Search the web for how to use React useEffect"
 - "What is on the Anthropic homepage?" (it will fetch and summarize)
-
-Note: The web search tool is a placeholder in this example. To use real web search, you need a search API key.
