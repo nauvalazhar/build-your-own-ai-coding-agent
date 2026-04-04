@@ -77,7 +77,7 @@ One dependency, one line. Headings stay headings, code blocks stay code blocks, 
 ### The basic fetch tool
 
 ```typescript
-const MAX_CONTENT_LENGTH = 50_000;
+const MAX_WEB_CONTENT = 50_000;
 
 const webFetchTool: Tool = {
   name: "web_fetch",
@@ -103,8 +103,8 @@ const webFetchTool: Tool = {
     const text = htmlToMarkdown(html);
 
     // 3. Truncate if too long
-    const truncated = text.length > MAX_CONTENT_LENGTH
-      ? text.slice(0, MAX_CONTENT_LENGTH) + "\n[Truncated]"
+    const truncated = text.length > MAX_WEB_CONTENT
+      ? text.slice(0, MAX_WEB_CONTENT) + "\n[Truncated]"
       : text;
 
     return truncated;

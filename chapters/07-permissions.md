@@ -156,7 +156,7 @@ Rules are checked before the tool's own `checkPermissions`. If a rule matches, i
 When the decision is "ask," we show the user what the agent wants to do:
 
 ```typescript
-async function askPermission(
+async function askUserPermission(
   toolName: string,
   input: Record<string, unknown>,
   rl: readline.Interface
@@ -238,7 +238,7 @@ for (const toolUse of toolUseBlocks) {
   }
 
   if (finalDecision === "ask") {
-    const allowed = await askPermission(tool.name, toolUse.input, rl);
+    const allowed = await askUserPermission(tool.name, toolUse.input, rl);
     if (!allowed) {
       toolResults.push({
         type: "tool_result",
