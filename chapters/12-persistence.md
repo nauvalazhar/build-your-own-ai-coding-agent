@@ -205,7 +205,7 @@ const memoryTool: Tool = {
 };
 ```
 
-On startup, load the memory file and add it to the system prompt. We can put all of this together in one function that builds the full system prompt from all sources:
+On startup, load the memory file and add it to the system prompt. In Chapter 4, our system prompt was a simple constant. Now it needs to include dynamic content (project instructions and memory), so we turn it into a function that builds the full prompt from all sources:
 
 ```typescript
 function loadMemory(): string | null {
