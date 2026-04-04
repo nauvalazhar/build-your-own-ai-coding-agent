@@ -258,10 +258,52 @@ The loop is dumb. The model is smart. Your job is to give the model tools (next 
 
 Our loop has no tools. The model cannot read files, search code, or run commands. It can only respond with text. In the next chapter, we will give it eyes and hands.
 
+## The REPL
+
+We have `agentLoop()` but we need a way for the user to type messages and see responses. The example uses a simple REPL (read-eval-print loop) with Node's `readline` module:
+
+```typescript
+import * as readline from "readline";
+
+async function main() {
+  const conversationHistory: Anthropic.MessageParam[] = [];
+
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  const ask = () => {
+    rl.question("> ", async (input) => {
+      const trimmed = input.trim();
+      if (!trimmed) return ask();
+
+      // Add user message to history
+      conversationHistory.push({ role: "user", content: trimmed });
+
+      // Run the agentic loop
+      const response = await agentLoop(conversationHistory);
+      console.log(`\n${response}\n`);
+
+      // Ask for the next message
+      ask();
+    });
+  };
+
+  ask();
+}
+
+main();
+```
+
+The user types a message, it gets added to the conversation history, the agentic loop runs (possibly calling tools multiple times), and the final text response is printed. Then the REPL asks for the next message. The conversation history carries forward, so follow-up messages have the full context.
+
+This REPL is the outer shell around the agentic loop. Every example in this guide uses the same pattern.
+
 ## Running the example
 
 ```bash
 npm run example:01
 ```
 
-The example sets up the basic loop with a hardcoded tool (a simple echo tool) so you can see the cycle in action. Type a message, and watch the model call the tool and use the result.
+The example uses a `get_time` tool so you can see the cycle in action. Try "what time is it?" and watch the model call the tool and use the result.
