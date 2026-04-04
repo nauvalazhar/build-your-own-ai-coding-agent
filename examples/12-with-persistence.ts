@@ -1,3 +1,8 @@
+// This example focuses on: persistence (Chapter 12).
+// Includes: tools (Ch2), edit (Ch3), system prompt (Ch4), streaming (Ch9).
+// Omits: permissions (Ch7), subagents (Ch8), compression (Ch6), concurrency (Ch10),
+//        web access (Ch11) to keep the code focused on persistence.
+
 import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 import * as fs from "fs";

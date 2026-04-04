@@ -1,3 +1,7 @@
+// This example focuses on: streaming (Chapter 9).
+// Includes: tools (Ch2), edit (Ch3), system prompt (Ch4), context (Ch5), compression (Ch6).
+// Omits: permissions (Ch7), subagents (Ch8) to keep the code focused on streaming.
+
 import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 import * as fs from "fs";

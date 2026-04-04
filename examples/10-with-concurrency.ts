@@ -1,3 +1,7 @@
+// This example focuses on: concurrent tool execution (Chapter 10).
+// Includes: tools (Ch2), edit (Ch3), system prompt (Ch4), streaming (Ch9).
+// Omits: permissions (Ch7), subagents (Ch8), compression (Ch6) to keep the code focused.
+
 import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 import * as fs from "fs";

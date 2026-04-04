@@ -1,3 +1,7 @@
+// This example focuses on: web access (Chapter 11).
+// Includes: tools (Ch2), edit (Ch3), system prompt (Ch4), streaming (Ch9), concurrency (Ch10).
+// Omits: permissions (Ch7), subagents (Ch8), compression (Ch6) to keep the code focused.
+
 import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 import * as fs from "fs";
