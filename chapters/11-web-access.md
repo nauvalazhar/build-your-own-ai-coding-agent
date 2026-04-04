@@ -244,7 +244,28 @@ checkPermissions(input) {
 }
 ```
 
-Production agents are more nuanced. They maintain a list of preapproved domains (like official documentation sites) that skip the permission prompt. Other domains always ask. This way, fetching `react.dev` is automatic but fetching `random-site.com` needs approval.
+Production agents are more nuanced. They maintain a list of preapproved domains (like official documentation sites) that skip the permission prompt. Other domains always ask:
+
+```typescript
+const PREAPPROVED_HOSTS = new Set([
+  "react.dev",
+  "developer.mozilla.org",
+  "docs.python.org",
+  "doc.rust-lang.org",
+  "go.dev",
+  // ... other trusted documentation sites
+]);
+
+checkPermissions(input) {
+  const hostname = new URL(input.url as string).hostname;
+  if (PREAPPROVED_HOSTS.has(hostname)) {
+    return "allow";  // Trusted docs site, no need to ask
+  }
+  return "ask";  // Unknown domain, ask the user
+}
+```
+
+This way, fetching `react.dev` is automatic but fetching `random-site.com` needs approval.
 
 ## What is still missing
 
