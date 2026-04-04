@@ -68,7 +68,7 @@ The whole thing is a `while(true)` loop wrapped in a function. First, you set up
 ```typescript
 import Anthropic from "@anthropic-ai/sdk";
 
-const client = new Anthropic();
+const client = new Anthropic(); // reads ANTHROPIC_API_KEY from environment
 
 // Tell the model what tools it has (Chapter 2 covers this in detail)
 const tools: Anthropic.Tool[] = [
@@ -79,6 +79,24 @@ const tools: Anthropic.Tool[] = [
   },
 ];
 ```
+
+Each tool has a `name`, a `description` (so the model knows what it does), and an `input_schema` that describes what arguments it accepts. The schema uses [JSON Schema](https://json-schema.org/) format. `properties` lists the arguments and their types, `required` lists which ones are mandatory. This `get_time` tool takes no arguments, so both are empty. A tool that reads a file would look like:
+
+```typescript
+{
+  name: "read_file",
+  description: "Read a file from disk",
+  input_schema: {
+    type: "object",
+    properties: {
+      file_path: { type: "string", description: "Path to the file" },
+    },
+    required: ["file_path"],
+  },
+}
+```
+
+The model reads these definitions and knows: "I can call `read_file` with a `file_path` string." We will build real tools in Chapter 2.
 
 Then the agentic loop itself:
 
