@@ -59,9 +59,20 @@ function htmlToText(html: string): string {
 }
 ```
 
-This works for simple pages but loses structure. Headings, lists, and code blocks all become flat text. Production agents use proper HTML-to-Markdown libraries (like [Turndown](https://github.com/mixmark-io/turndown)) that preserve the document structure. A heading stays a heading. A code block stays a code block. The model can read the result much better.
+This works for simple pages but loses structure. Headings, lists, and code blocks all become flat text.
 
-For our example, regex stripping is fine. If you want better results, add Turndown as a dependency and replace the function with `new Turndown().turndown(html)`.
+A better approach is converting HTML to Markdown using a library like [Turndown](https://github.com/mixmark-io/turndown). It preserves the document structure so the model can read it properly:
+
+```typescript
+import Turndown from "turndown";
+const turndown = new Turndown();
+
+function htmlToMarkdown(html: string): string {
+  return turndown.turndown(html);
+}
+```
+
+One dependency, one line. Headings stay headings, code blocks stay code blocks, links stay links. This is what production agents use. Our example uses Turndown since it is simple and gives much better results.
 
 ### The basic fetch tool
 
@@ -88,8 +99,8 @@ const webFetchTool: Tool = {
     }
     const html = await response.text();
 
-    // 2. Convert HTML to text
-    const text = htmlToText(html);
+    // 2. Convert HTML to markdown
+    const text = htmlToMarkdown(html);
 
     // 3. Truncate if too long
     const truncated = text.length > MAX_CONTENT_LENGTH

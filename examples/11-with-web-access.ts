@@ -4,6 +4,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { execSync } from "child_process";
 import * as readline from "readline";
+import Turndown from "turndown";
 
 const client = new Anthropic();
 
@@ -57,14 +58,11 @@ function zodToJsonSchema(schema: z.ZodObject<any>): Record<string, unknown> {
 // --- URL cache ---
 const urlCache = new Map<string, string>();
 
-// --- Strip HTML to plain text ---
-function htmlToText(html: string): string {
-  return html
-    .replace(/<script[\s\S]*?<\/script>/gi, "")
-    .replace(/<style[\s\S]*?<\/style>/gi, "")
-    .replace(/<[^>]+>/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+// --- Convert HTML to Markdown using Turndown ---
+const turndown = new Turndown();
+
+function htmlToMarkdown(html: string): string {
+  return turndown.turndown(html);
 }
 
 // --- Tools ---
@@ -208,15 +206,15 @@ const tools: Tool[] = [
         }
 
         const html = await response.text();
-        const text = htmlToText(html);
+        const markdown = htmlToMarkdown(html);
 
         // Truncate if too long
-        const truncated = text.length > MAX_WEB_CONTENT
-          ? text.slice(0, MAX_WEB_CONTENT) + "\n\n[Content truncated]"
-          : text;
+        const truncated = markdown.length > MAX_WEB_CONTENT
+          ? markdown.slice(0, MAX_WEB_CONTENT) + "\n\n[Content truncated]"
+          : markdown;
 
         // Use a secondary model to extract relevant content
-        console.log(`  [extracting] Applying prompt to ${text.length} chars...`);
+        console.log(`  [extracting] Applying prompt to ${markdown.length} chars...`);
         const extraction = await client.messages.create({
           model: "claude-haiku-4-5-20251001",
           max_tokens: 2048,
