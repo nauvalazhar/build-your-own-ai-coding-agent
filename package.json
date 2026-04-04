@@ -13,7 +13,9 @@
     "example:07": "tsx --env-file=.env examples/07-with-permissions.ts",
     "example:08": "tsx --env-file=.env examples/08-with-subagents.ts",
     "example:09": "tsx --env-file=.env examples/09-with-streaming.ts",
-    "example:10": "tsx --env-file=.env examples/10-with-concurrency.ts"
+    "example:10": "tsx --env-file=.env examples/10-with-concurrency.ts",
+    "example:11": "tsx --env-file=.env examples/11-with-web-access.ts",
+    "example:12": "tsx --env-file=.env examples/12-with-persistence.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

@@ -286,18 +286,7 @@ The bigger the batch of concurrent-safe tools, the bigger the win. If the model 
 
 ## What is still missing
 
-Nothing! This is the final feature layer. You now have a complete AI coding agent with:
-
-- An agentic loop (Chapter 1)
-- Tools for reading, editing, searching, and running commands (Chapters 2-3)
-- A system prompt that guides behavior (Chapter 4)
-- Context management and compression (Chapters 5-6)
-- A permission system (Chapter 7)
-- Subagents for delegation (Chapter 8)
-- Streaming for real-time output (Chapter 9)
-- Concurrent tool execution (this chapter)
-
-The next and final chapter wraps up with ideas for where to go from here.
+The core agent is complete. But it can only work with local files. In the next chapter, we give it access to the web so it can look up documentation, search for solutions, and read online references.
 
 ## Running the example
 

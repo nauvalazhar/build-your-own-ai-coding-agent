@@ -47,7 +47,9 @@ cp .env.example .env
 | 08 | [Subagents](chapters/08-subagents.md) | Delegating work to isolated child agents |
 | 09 | [Streaming](chapters/09-streaming.md) | Showing responses token by token |
 | 10 | [Concurrent Tools](chapters/10-concurrent-tools.md) | Running safe tools in parallel |
-| 11 | [What's Next](chapters/11-whats-next.md) | Where to go from here |
+| 11 | [Web Access](chapters/11-web-access.md) | Fetching URLs and searching the web |
+| 12 | [Persistence](chapters/12-persistence.md) | Saving conversations and project instructions |
+| 13 | [What's Next](chapters/13-whats-next.md) | Where to go from here |
 
 ## Running examples
 

@@ -1,8 +1,8 @@
-# Chapter 11: What's Next
+# Chapter 13: What's Next
 
 ## What you built
 
-Over the last 10 chapters, you built a complete AI coding agent from scratch:
+Over the last 12 chapters, you built a complete AI coding agent from scratch:
 
 | Chapter | What you added |
 |---|---|
@@ -16,6 +16,8 @@ Over the last 10 chapters, you built a complete AI coding agent from scratch:
 | 8. Subagents | Same loop, isolated context. Delegation without pollution. |
 | 9. Streaming | Token-by-token output. The model feels fast even when it is not. |
 | 10. Concurrency | Safe tools run in parallel. Unsafe tools run alone. |
+| 11. Web Access | Fetch URLs and search the web. The agent can read documentation and look things up. |
+| 12. Persistence | Save conversations to disk, resume later, project instructions that carry across sessions. |
 
 These are the same core ideas behind production AI coding tools. The implementations are simplified, but the architecture is real.
 
@@ -53,11 +55,9 @@ If you want to keep building on what you have:
 
 - **A todo/task tool** that lets the model track what it has done and what is left
 - **Git tools** (status, diff, commit, log) so the model can manage its own changes
-- **A web search tool** for looking up documentation and API references
 - **A diff viewer** that shows exactly what changed after each edit, in a readable format
 - **Multiple models** for different tasks (fast model for search, powerful model for edits)
 - **A GUI** with a chat interface, file tree, and diff viewer
-- **Conversation persistence** so you can resume where you left off
 - **Custom tool plugins** where users can add their own tools without modifying the agent
 
 ## The core idea
