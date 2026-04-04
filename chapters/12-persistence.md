@@ -123,6 +123,25 @@ The `/resume` and `/new` commands are intercepted before the input reaches the a
 
 After `/resume`, the model sees the entire previous conversation on the next turn. It can reference files it read, edits it made, and decisions from the last session.
 
+### Showing previous sessions
+
+Our example saves one session file. But what if the user has had many sessions and wants to pick which one to resume?
+
+Production agents save each session with a unique ID (e.g., `session-<uuid>.jsonl`) and store metadata like the first user message, a title, and the timestamp. When the user asks to resume, the agent shows a list:
+
+```
+Previous sessions:
+  1. [Apr 3] "Help me refactor the auth module"
+  2. [Apr 1] "Add dark mode to the settings page"
+  3. [Mar 28] "Fix the login bug"
+
+Which session? >
+```
+
+They do not parse the entire JSONL file to show this list. Instead, they read just the first and last few lines of each file (head and tail) to extract the title and last prompt. This is fast even with large session files.
+
+For our example, a single session file is enough. But if you want to support multiple sessions, the pattern is: give each session a unique filename, store a summary in the first line, and list them by reading just the file headers.
+
 ## Project instructions
 
 Some instructions apply to every session in a project. "This project uses Tailwind." "Run tests with npm test." "The API is in src/api/." You do not want to repeat these every time you start the agent.
