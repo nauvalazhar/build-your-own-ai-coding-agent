@@ -140,7 +140,37 @@ Which session? >
 
 They do not parse the entire JSONL file to show this list. Instead, they read just the first and last few lines of each file (head and tail) to extract the title and last prompt. This is fast even with large session files.
 
-For our example, a single session file is enough. But if you want to support multiple sessions, the pattern is: give each session a unique filename, store a summary in the first line, and list them by reading just the file headers.
+For our example, a single session file is enough. But if you want to support multiple sessions, the pattern is: give each session a unique filename, store a summary in the first line, and list them by reading just the headers:
+
+```typescript
+// Save with a unique ID and a summary as the first line
+const sessionId = crypto.randomUUID();
+const sessionFile = `.agent/sessions/${sessionId}.jsonl`;
+fs.appendFileSync(sessionFile,
+  JSON.stringify({ type: "metadata", summary: userInput, createdAt: Date.now() }) + "\n"
+);
+
+// List sessions by reading only the first line of each file
+function listSessions(): { id: string; summary: string; date: string }[] {
+  const dir = ".agent/sessions";
+  if (!fs.existsSync(dir)) return [];
+
+  return fs.readdirSync(dir)
+    .filter(f => f.endsWith(".jsonl"))
+    .map(f => {
+      const firstLine = fs.readFileSync(path.join(dir, f), "utf-8").split("\n")[0];
+      const meta = JSON.parse(firstLine);
+      return {
+        id: f.replace(".jsonl", ""),
+        summary: meta.summary,
+        date: new Date(meta.createdAt).toLocaleDateString(),
+      };
+    })
+    .sort((a, b) => b.date.localeCompare(a.date));
+}
+```
+
+The first line of each file is a metadata entry with the summary. Listing sessions only reads that one line per file, not the entire conversation.
 
 ## Project instructions
 
