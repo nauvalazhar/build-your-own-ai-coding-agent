@@ -38,13 +38,32 @@ The agent fetched the React docs and extracted the relevant information. The use
 
 The fetch tool takes a URL and returns the page content as text. But there are a few problems to solve:
 
-**HTML is noisy.** A web page is full of navigation, ads, scripts, and styling. The model does not need any of that. We need to strip the HTML down to just the text content.
+**HTML is noisy.** A web page is full of navigation, ads, scripts, and styling. The model does not need any of that. We need to convert HTML to clean text.
 
 **Pages can be huge.** Some documentation pages are 100,000+ characters. Dumping all of that into the context wastes tokens. We need to truncate.
 
 **The model needs focus.** Instead of sending the entire page content, we can ask the model "here is the page, extract the part about X." This gives the main model a focused summary instead of a wall of text.
 
-Here is the tool:
+### Converting HTML to text
+
+The simplest approach is stripping HTML tags with regex:
+
+```typescript
+function htmlToText(html: string): string {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+```
+
+This works for simple pages but loses structure. Headings, lists, and code blocks all become flat text. Production agents use proper HTML-to-Markdown libraries (like [Turndown](https://github.com/mixmark-io/turndown)) that preserve the document structure. A heading stays a heading. A code block stays a code block. The model can read the result much better.
+
+For our example, regex stripping is fine. If you want better results, add Turndown as a dependency and replace the function with `new Turndown().turndown(html)`.
+
+### The basic fetch tool
 
 ```typescript
 const MAX_CONTENT_LENGTH = 50_000;
@@ -69,13 +88,8 @@ const webFetchTool: Tool = {
     }
     const html = await response.text();
 
-    // 2. Convert HTML to plain text (strip tags)
-    const text = html
-      .replace(/<script[\s\S]*?<\/script>/gi, "")
-      .replace(/<style[\s\S]*?<\/style>/gi, "")
-      .replace(/<[^>]+>/g, " ")
-      .replace(/\s+/g, " ")
-      .trim();
+    // 2. Convert HTML to text
+    const text = htmlToText(html);
 
     // 3. Truncate if too long
     const truncated = text.length > MAX_CONTENT_LENGTH
@@ -87,7 +101,7 @@ const webFetchTool: Tool = {
 };
 ```
 
-This is the basic version. It fetches the page, strips HTML tags, and truncates. The model gets plain text it can read and reason about.
+This fetches the page, converts to text, and truncates. The model gets readable content it can reason about.
 
 ### Using a secondary model for extraction
 
