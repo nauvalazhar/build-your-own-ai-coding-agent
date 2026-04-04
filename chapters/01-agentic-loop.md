@@ -63,49 +63,74 @@ A tool is just a function. The model says "call `read_file` with this path", you
 
 ## The loop
 
-The whole thing is a `while(true)` loop. Here it is:
+The whole thing is a `while(true)` loop wrapped in a function. First, you set up the API client and define what tools the model can use:
 
 ```typescript
-while (true) {
-  // 1. Send the conversation to the API
-  const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-20250514",
-    max_tokens: 4096,
-    messages: conversationHistory,
-  });
+import Anthropic from "@anthropic-ai/sdk";
 
-  // 2. Add the assistant's response to history
-  conversationHistory.push({ role: "assistant", content: response.content });
+const client = new Anthropic();
 
-  // 3. Check if the model used any tools
-  const toolUseBlocks = response.content.filter(
-    block => block.type === "tool_use"
-  );
+// Tell the model what tools it has (Chapter 2 covers this in detail)
+const tools: Anthropic.Tool[] = [
+  {
+    name: "get_time",
+    description: "Get the current date and time",
+    input_schema: { type: "object", properties: {}, required: [] },
+  },
+];
+```
 
-  if (toolUseBlocks.length === 0) {
-    // No tools called. The model is done talking. Exit the loop.
-    break;
-  }
+Then the agentic loop itself:
 
-  // 4. Execute each tool and collect results
-  const toolResults = [];
-  for (const toolUse of toolUseBlocks) {
-    const result = executeTool(toolUse.name, toolUse.input);
-    toolResults.push({
-      type: "tool_result",
-      tool_use_id: toolUse.id,
-      content: result,
+```typescript
+async function agentLoop(
+  conversationHistory: Anthropic.MessageParam[]
+): Promise<string> {
+  while (true) {
+    // 1. Send the conversation to the API
+    const response = await client.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 4096,
+      tools,
+      messages: conversationHistory,
     });
+
+    // 2. Add the assistant's response to history
+    conversationHistory.push({ role: "assistant", content: response.content });
+
+    // 3. Check if the model used any tools
+    const toolUseBlocks = response.content.filter(
+      (block): block is Anthropic.ToolUseBlock => block.type === "tool_use"
+    );
+
+    if (toolUseBlocks.length === 0) {
+      // No tools called. The model is done. Extract the text and return it.
+      const textBlocks = response.content.filter(
+        (block): block is Anthropic.TextBlock => block.type === "text"
+      );
+      return textBlocks.map((b) => b.text).join("\n");
+    }
+
+    // 4. Execute each tool and collect results
+    const toolResults: Anthropic.ToolResultBlockParam[] = [];
+    for (const toolUse of toolUseBlocks) {
+      const result = executeTool(toolUse.name, toolUse.input);
+      toolResults.push({
+        type: "tool_result",
+        tool_use_id: toolUse.id,
+        content: result,
+      });
+    }
+
+    // 5. Push tool results back into the conversation as a user message
+    conversationHistory.push({ role: "user", content: toolResults });
+
+    // 6. Loop back to step 1
   }
-
-  // 5. Push tool results back into the conversation as a user message
-  conversationHistory.push({ role: "user", content: toolResults });
-
-  // 6. Loop back to step 1
 }
 ```
 
-That is the entire architecture. Everything else in this guide is adding features on top of this loop.
+That is the entire architecture. The function takes the conversation history, runs the loop until the model stops calling tools, and returns the final text response. Everything else in this guide is adding features on top of this loop.
 
 ## How it works, step by step
 
