@@ -140,15 +140,7 @@ function loadProjectInstructions(): string | null {
 }
 ```
 
-Load it on startup and prepend it to the system prompt:
-
-```typescript
-const projectInstructions = loadProjectInstructions();
-
-const fullSystemPrompt = projectInstructions
-  ? `${SYSTEM_PROMPT}\n\n# Project Instructions\n${projectInstructions}`
-  : SYSTEM_PROMPT;
-```
+If the file exists, its content gets added to the system prompt. We will wire this into `buildSystemPrompt()` later in this chapter, along with memory.
 
 Now any developer on the team can add a `AGENT.md` to the repo:
 
