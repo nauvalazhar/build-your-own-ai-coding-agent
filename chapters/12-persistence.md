@@ -225,7 +225,23 @@ Use save_memory to remember important things about the user or project.`;
 }
 ```
 
-Call `buildSystemPrompt()` on each turn (not once at startup) so that new memories saved during the session are included in the next API call.
+Call `buildSystemPrompt()` inside the agentic loop, not once at startup. This way, if the agent saves a memory on turn 3, the system prompt on turn 4 includes it:
+
+```typescript
+while (true) {
+  const systemPrompt = buildSystemPrompt(); // fresh every turn
+
+  const stream = client.messages.stream({
+    model: "claude-sonnet-4-20250514",
+    max_tokens: 4096,
+    system: systemPrompt,
+    tools: apiTools,
+    messages,
+  });
+
+  // ... rest of the loop
+}
+```
 
 The agent sees its own past notes every session. Over time, the memory file builds up a picture of the user and the project:
 
