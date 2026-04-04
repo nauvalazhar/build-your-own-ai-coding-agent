@@ -127,10 +127,10 @@ After `/resume`, the model sees the entire previous conversation on the next tur
 
 Some instructions apply to every session in a project. "This project uses Tailwind." "Run tests with npm test." "The API is in src/api/." You do not want to repeat these every time you start the agent.
 
-The solution: a markdown file in the project root that the agent reads automatically. We call it `CLAUDE.md` (following the convention from Claude Code), but you can name it anything.
+The solution: a markdown file in the project root that the agent reads automatically. We call it `AGENT.md`, but you can name it anything. Claude Code uses `CLAUDE.md`, Codex uses `AGENTS.md`. The name does not matter. The idea is the same.
 
 ```typescript
-const PROJECT_INSTRUCTIONS_FILE = "CLAUDE.md";
+const PROJECT_INSTRUCTIONS_FILE = "AGENT.md";
 
 function loadProjectInstructions(): string | null {
   if (!fs.existsSync(PROJECT_INSTRUCTIONS_FILE)) {
@@ -150,7 +150,7 @@ const fullSystemPrompt = projectInstructions
   : SYSTEM_PROMPT;
 ```
 
-Now any developer on the team can add a `CLAUDE.md` to the repo:
+Now any developer on the team can add a `AGENT.md` to the repo:
 
 ```markdown
 # Project Instructions
@@ -169,9 +169,9 @@ The agent reads this on every startup and follows the instructions. It is like a
 Production agents support multiple instruction files at different levels:
 
 ```
-~/.claude/CLAUDE.md           → global (all projects)
-./CLAUDE.md                   → project (shared with team)
-./CLAUDE.local.md             → local (your personal overrides, gitignored)
+~/.agent/AGENT.md             → global (all projects)
+./AGENT.md                    → project (shared with team)
+./AGENT.local.md              → local (your personal overrides, gitignored)
 ```
 
 Each level adds to the previous one. Global instructions apply everywhere. Project instructions apply to this repo. Local instructions are your personal preferences that you do not want to commit.
@@ -249,6 +249,6 @@ Try:
 4. The agent loads the previous conversation
 
 Also try:
-- Create a `CLAUDE.md` file in the project root with some instructions
+- Create a `AGENT.md` file in the project root with some instructions
 - Ask the agent to "remember that I prefer dark themes" (it saves to memory)
 - Restart and check that the memory persists

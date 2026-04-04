@@ -16,7 +16,7 @@ const client = new Anthropic();
 const AGENT_DIR = ".agent";
 const SESSION_FILE = path.join(AGENT_DIR, "session.jsonl");
 const MEMORY_FILE = path.join(AGENT_DIR, "memory.md");
-const PROJECT_INSTRUCTIONS_FILE = "CLAUDE.md";
+const PROJECT_INSTRUCTIONS_FILE = "AGENT.md";
 
 // --- Load project instructions and memory ---
 function loadProjectInstructions(): string | null {
@@ -51,7 +51,7 @@ function buildSystemPrompt(): string {
 
   const instructions = loadProjectInstructions();
   if (instructions) {
-    parts.push(`# Project Instructions (from CLAUDE.md)\n${instructions}`);
+    parts.push(`# Project Instructions (from AGENT.md)\n${instructions}`);
   }
 
   const memory = loadMemory();
@@ -364,7 +364,7 @@ async function main() {
   // Check for project instructions
   const instructions = loadProjectInstructions();
   if (instructions) {
-    console.log("Loaded project instructions from CLAUDE.md");
+    console.log("Loaded project instructions from AGENT.md");
   }
 
   // Check for memory
