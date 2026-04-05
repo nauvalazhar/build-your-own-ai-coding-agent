@@ -122,7 +122,9 @@ const tools: Tool[] = [
     isConcurrencySafe: true,
     async call(input) {
       const dir = (input.directory as string) || ".";
-      const rx = new RegExp(input.pattern as string);
+      let rx: RegExp;
+      try { rx = new RegExp(input.pattern as string); }
+      catch { return "Error: Invalid regex pattern."; }
       const res: string[] = [];
       function s(d: string) {
         try {

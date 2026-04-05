@@ -186,7 +186,9 @@ const searchFilesTool: Tool = {
   }),
   async call(input) {
     const dir = (input.directory as string) || ".";
-    const regex = new RegExp(input.pattern as string);
+    let regex: RegExp;
+    try { regex = new RegExp(input.pattern as string); }
+    catch { return "Error: Invalid regex pattern."; }
     const results: string[] = [];
     function search(d: string) {
       try {
